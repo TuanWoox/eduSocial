@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { isEmail } = require('validation');
+const Schema = mongoose.Schema;
 
 const UserSchema = new mongoose.Schema({
   googleId: {
@@ -31,8 +32,55 @@ const UserSchema = new mongoose.Schema({
       return !this.googleId;
     },
   },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }
-});
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  bio: { 
+        type: String 
+    },
+    profilePic: { 
+        type: String 
+    },
+  socialLinks: {
+      facebook: { type: String, trim: true },
+      github: { type: String, trim: true },
+      linkedin: { type: String, trim: true }
+    },
+  followingTags: [String],
+  coursesProgress: [{
+        courseId: { 
+            type: Schema.Types.ObjectId, 
+            ref: 'Course' 
+        },
+        currentLesson: { 
+            type: Number 
+        }, 
+        progressPercentage: { 
+            type: Number 
+        }, 
+        lastAccessed: { 
+            type: Date, default: Date.now 
+        }
+      }],
+  comments : [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ],
+  questions : [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Question'
+        }
+    ],
+  own_series : [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Series'
+        }
+      ]
+},
+  {timestamps: true}
+);
 // Mã hóa mật khẩu trước khi lưu vào database
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
