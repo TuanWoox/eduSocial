@@ -32,14 +32,14 @@ const questionSchema = new Schema({
     },
     isPublished: {
       type: Boolean,
-      default: false
+      default: true
     },
     views : {
         type: Number,
         default: 0
     }
 },
-    {timestamp: true}
+    {timestamps: true}
 );
   
 module.exports = mongoose.model('Question', questionSchema)

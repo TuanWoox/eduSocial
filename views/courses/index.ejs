@@ -1,4 +1,13 @@
 <% layout('layouts/indexboilerplate') -%>
+<div class="row mt-4 p-4 m-auto justify-content-center">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic.find %>" aria-label="Tìm kiếm " aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
+        </div>
+      </div>
+</div>
+
 <% for(let course of courses) {%>
     <div class="card mx-2 my-2 course" style="width: 234px; height: 400px;">
         <!-- Thumbnail Image -->

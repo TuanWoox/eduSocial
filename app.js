@@ -12,6 +12,7 @@ const passport = require('passport');
 const connectFlash = require('connect-flash');
 const dotenv = require('dotenv');
 const ejsMate = require('ejs-mate')
+const methodOverride = require('method-override');
 app.set('view engine','ejs');
 app.engine('ejs', ejsMate);
 app.set('views','./views');
@@ -32,6 +33,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use(express.json());
 app.use(express.static(path.join(__dirname,'public')));
 app.set('views', path.join(__dirname,'views'));
+app.use(methodOverride('_method'));
 // Sử dụng middleware để phân tích dữ liệu URL-encoded
 app.use(express.urlencoded({ extended: true }));
 // Use cookie-parser middleware
@@ -58,6 +60,10 @@ app.use('/api', authRoutes);
 app.use('/user', userRoutes);
 app.use('/courses', courseRoutes)
 app.use('/questions', questionRoutes)
+
+
+
+
 //ghi thời gian
 app.use((req,res,next)=>{
   console.log('Time:',Date.now());
