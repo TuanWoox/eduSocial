@@ -34,7 +34,7 @@ async function main() {
   })
 
 async function seedDB() {
-
+  await Course.deleteMany({});
   for (let i = 0; i < 10; i++) { // Create 10 sample courses
     const course = new Course({
       title: sample(courseTitles),

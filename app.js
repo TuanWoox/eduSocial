@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const courseRoutes = require('./routes/course');
+const questionRoutes = require('./routes/question');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const app = express();
@@ -56,6 +57,7 @@ app.get('/',(req,res)=>{
 app.use('/api', authRoutes);
 app.use('/user', userRoutes);
 app.use('/courses', courseRoutes)
+app.use('/questions', questionRoutes)
 //ghi thời gian
 app.use((req,res,next)=>{
   console.log('Time:',Date.now());
