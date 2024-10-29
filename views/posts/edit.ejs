@@ -1,0 +1,27 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="container mt-2" style="width: 80%;">
+    <h2>Edit Your Post</h2>
+    <form id="postForm" action="/user/post/<%= post._id %>?_method=PUT" method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Post Title</label>
+            <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>"> 
+            <p><%= post.title %></p>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Post Content</label>
+            <textarea class="form-control" id="content" name="post[content]" rows="5" required><%= post.content %></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">Post Category</label>
+            <input type="text" class="form-control" id="type" name="post[type]" required value="<%= post.type %>">
+        </div>
+        <div class="mb-3">
+            <label for="media">File (Hình ảnh hoặc video):</label>
+            <input type="file" name="media" id="media">
+            <% if (post && post.media) { %>
+                <p>File hiện tại: <a href="<%= post.media %>" target="_blank">Xem file</a></p>
+            <% } %>
+        </div>        
+        <button type="submit" class="btn btn-primary">Edit Your post</button>
+    </form>
+</div>
