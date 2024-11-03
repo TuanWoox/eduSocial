@@ -24,12 +24,12 @@ module.exports.createQuestion = async (req, res) => {
     res.redirect(`/questions/${newQuestion._id}`);
 };
 module.exports.viewEditQuestion = async (req,res) => {
-    const question = await Question.findById(req.params.id);
+    const question = await Question.findById(req.params.id)
     res.render('questions/edit', {topic,question});
 }
 //Not completely done
 module.exports.viewQuestion = async (req,res) => {
-    const question = await Question.findById(req.params.id);
+    const question = await Question.findById(req.params.id).populate('comments');
     question.views += 1;
     await question.save();
     res.render('questions/show', {topic,question});
@@ -47,9 +47,6 @@ module.exports.viewQuestion = async (req,res) => {
         }
         res.redirect(`/questions/${id}`);
 };
-    
-
-
 
 module.exports.deleteQuestion = async (req,res) => {
     await Question.findByIdAndDelete({_id : req.params.id})

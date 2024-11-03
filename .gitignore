@@ -71,3 +71,5 @@ out/
 # Nuxt.js build output
 .nuxt/
 node_modules/
+
+.env

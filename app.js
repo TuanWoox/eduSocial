@@ -62,8 +62,6 @@ app.use('/courses', courseRoutes)
 app.use('/questions', questionRoutes)
 
 
-
-
 //ghi thời gian
 app.use((req,res,next)=>{
   console.log('Time:',Date.now());

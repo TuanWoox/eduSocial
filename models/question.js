@@ -19,7 +19,7 @@ const questionSchema = new Schema({
     }],
     comments: [{
         type: Schema.Types.ObjectId,
-        ref: 'Comment'
+        ref: 'QuestionComment'
     }
     ],
     upvotes: {
@@ -37,7 +37,7 @@ const questionSchema = new Schema({
     views : {
         type: Number,
         default: 0
-    }
+    },
 },
     {timestamps: true}
 );
