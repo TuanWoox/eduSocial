@@ -1,3 +1,10 @@
+if(process.env.NODE_ENV !== "production")
+{
+    require('dotenv').config();
+    //If we running application in dev mod => require .env and add in process so process will have env
+    // and we can access it process.env.VARIABLENAME!
+}
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
