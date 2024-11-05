@@ -8,19 +8,13 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET
 });
 
-
+// Set up multer-storage-cloudinary
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: async (req, file) => {
-      // Define upload folder and set resource type based on the file's MIME type
-      let folder = 'eduSocial'; // Set the default folder
-      let resource_type = 'auto'; // 'auto' lets Cloudinary determine based on the file type
-      // Return the configuration object
-      return {
-        folder,
-        resource_type,  // Automatically determine image or video based on MIME type
-      };
-    },
+    cloudinary,
+    params: {
+        folder: 'Posts',
+        allowedFormats: ['jpeg', 'png', 'jpg']
+    }
 });
 
 // Export the storage configuration for use in other parts of your application

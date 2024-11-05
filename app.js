@@ -11,15 +11,16 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const courseRoutes = require('./routes/course');
 const questionRoutes = require('./routes/question');
+const postRoutes = require('./routes/post');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const app = express();
 const session = require('express-session');
 const passport = require('passport');
 const connectFlash = require('connect-flash');
-const dotenv = require('dotenv');
 const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override');
+const dotenv = require('dotenv');
 app.set('view engine','ejs');
 app.engine('ejs', ejsMate);
 app.set('views','./views');
@@ -37,6 +38,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Middleware
 //chuyển dòng json thành object javascript để dùng trong route
+// Cấu hình để phục vụ file tĩnh
+app.use(express.static('public'));
 app.use(express.json());
 app.use(express.static(path.join(__dirname,'public')));
 app.set('views', path.join(__dirname,'views'));
@@ -58,7 +61,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 // Connect flash
 app.use(connectFlash());
-
 // Routes
 app.get('/',(req,res)=>{
   res.render('home');
@@ -67,6 +69,7 @@ app.use('/api', authRoutes);
 app.use('/user', userRoutes);
 app.use('/courses', courseRoutes)
 app.use('/questions', questionRoutes)
+app.use('/posts', postRoutes)
 
 
 //ghi thời gian

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const { isEmail } = require('validation');
 const Schema = mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   googleId: {
     type: String,
     required: false

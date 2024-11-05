@@ -1,0 +1,46 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="container mt-4">
+    <div class="breadcrumb mb-3 d-flex align-items-center">
+        <i class="fa-solid fa-house me-2"></i> =>
+        <p class="mb-0">Bài Viết</p>=>
+        <p class="mb-0">Tạo bài viết</p>
+    </div>
+</div>
+<div class="container">
+    <h1>Create a New Post</h1>
+    <a href="/posts" class="btn btn-sm btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Posts</a>
+
+    <!-- Form for Creating Post -->
+    <form action="/posts/create" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label"><h5>Post Title</h5></label>
+            <input type="text" id="title" name="post[title]" class="form-control" placeholder="Enter your post title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category"><h5>Category</h5></label>
+            <select class="form-control" id="category" name="post[type]" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Technology">Technology</option>
+                <option value="Science">Science</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Education">Education</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="content"><h5>Write your content here</h5></label>
+            <textarea class="form-control" name="post[content]" id="content" rows="5" placeholder="Write your post content here..." required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="formFile" class="form-label"><h5>Upload your pictures (Max: 5)</h5></label>
+            <input class="form-control" type="file" id="formFile" name="images" multiple>
+            <small class="form-text text-muted">We will take only 5 pictures</small>
+        </div>
+        
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-info">Publish Post</button>
+    </form>
+</div>

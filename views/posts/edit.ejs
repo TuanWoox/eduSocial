@@ -1,0 +1,39 @@
+<% layout('layouts/indexboilerplate') -%> 
+<div class="container">
+    <a href="/posts/<%= post._id %>" class="btn btn-primary" style="width: auto;">Back to posts</a>
+</div>
+<div class="container mt-2" style="width: 80%;">     
+    <h2>Edit Your Post</h2>     
+    <form id="postForm" action="/posts/<%= post._id %>?_method=PUT" method="post" enctype="multipart/form-data">         
+        <div class="mb-3">             
+            <label for="title" class="form-label">Post Title</label>             
+            <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">              
+            <p><%= post.title %></p>         
+        </div>         
+        <div class="mb-3">             
+            <label for="content" class="form-label">Post Content</label>             
+            <textarea class="form-control" id="content" name="post[content]" rows="5" required><%= post.content %></textarea>         
+        </div>         
+        <div class="mb-3">             
+            <label for="type" class="form-label">Post Category</label>             
+            <input type="text" class="form-control" id="type" name="post[type]" required value="<%= post.type %>">         
+        </div>         
+
+        <div class="mb-3">
+            <label for="formFile" class="form-label"><h5>Upload your pictures (Max: 5)</h5></label>
+            <input class="form-control" type="file" id="formFile" name="images" multiple>
+            <small class="form-text text-muted">We will take only 5 pictures</small>
+        </div>               
+        <div class="mb-3">
+            <% post.images.forEach(function(img,i) { %>
+                <img src="<%=img.url%>" class ="img-thumbnail"alt="">
+                <div class="form-check-inline">
+                    <input type="checkbox"  id="img-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
+                </div>
+                <label for="img-<%=i%>">Delete?</label>
+            <% }) %>
+        </div>
+
+        <button class="btn btn-success" type="submit">Update your image</button>
+    </form> 
+</div>

@@ -1,0 +1,33 @@
+const express = require('express');
+const multer = require('multer');
+const middleware = require('../middleware/authMiddleware');
+const postController = require('../controllers/post');
+const CatchAsync = require('../utils/CatchAsync');
+const router = express.Router();
+const { storage } = require('../cloudinary/postCloud');
+const upload = multer({storage});
+  
+
+router.get('/', CatchAsync(postController.viewPost));
+
+router.route('/create')
+.get(postController.viewCreate)
+.post(upload.array('images', 5), CatchAsync(postController.createPost));
+
+router.route('/:id/delete')
+.get(CatchAsync(postController.viewDelete));
+
+// Route để view form edit bài viết
+router.route('/:id/edit')
+    .get(CatchAsync(postController.viewEdit));
+
+// Route để lấy bài viết cụ thể và cập nhật
+router.route('/:id')
+    .get(CatchAsync(postController.viewAPost))
+    .delete(CatchAsync(postController.deletePost))
+    .put(upload.array('images',5),CatchAsync(postController.editPost));
+
+// router.get('/:id/like',CatchAsync(postController.addLike))
+
+
+module.exports = router;

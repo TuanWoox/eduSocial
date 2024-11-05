@@ -20,8 +20,9 @@ const questionSchema = new Schema({
     comments: [{
         type: Schema.Types.ObjectId,
         ref: 'QuestionComment'
-    }
-    ],
+        
+    }]
+    ,
     upvotes: {
       type: Number,
       default: 0
