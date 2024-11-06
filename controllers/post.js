@@ -1,8 +1,7 @@
 const Post = require('../models/Post');
 const path = require('path');
 const fs = require('fs');
-const { model } = require('mongoose');
-const { cloundinary, cloudinary } = require('../cloudinary/postCloud');
+const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Bài viết',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -27,12 +26,15 @@ module.exports.viewCreate = (req,res) => {
 
 //This is for posting a post
 module.exports.createPost = async(req,res) =>{
-    const {title,content,type} = req.body.post;
+    const {title,content,type,images} = req.body.post;
+    const imagesParsed = JSON.parse(images);
     const newPost = new Post({
         title,
         content,
-        type});
-    newPost.images = req.files.map(f=> ({url: f.path, filename: f.filename}));
+        type,
+        images: imagesParsed,
+    });
+   
     await newPost.save();
     res.redirect(`/posts/${newPost._id}`);
 }
@@ -62,18 +64,23 @@ module.exports.viewEdit = async (req, res) => {
 // Xử lý chỉnh sửa bài viết
 module.exports.editPost = async (req, res) => {
     const id = req.params.id;
-    const post = await Post.findByIdAndUpdate(req.params.id, req.body.post, { new: true, runValidators: true });
-    console.log(req.files);
-    const imgs = req.files.map(f => ({url:f.path, filename: f.filename}));
+    const newData = {
+        title: req.body.post.title,
+        type: req.body.post.type,
+        content: req.body.post.content,
+    }
+    const post = await Post.findByIdAndUpdate(req.params.id, newData, { new: true, runValidators: true });
+    const imgs = JSON.parse(req.body.newImages);
     post.images.push(...imgs);
     await post.save();
-    if(req.body.deleteImages)
+    const deletedImages = JSON.parse(req.body.deletedImages);
+    if(deletedImages)
         {
-            for(let filename of req.body.deleteImages )
+            for(let filename of deletedImages )
             {
                 await cloudinary.uploader.destroy(filename);
             }
-            await Post.updateOne({$pull: {images: {filename: {$in: req.body.deleteImages}}}});
+            await Post.updateOne({$pull: {images: {filename: {$in: deletedImages}}}});
     }
     res.redirect(`/posts/${id}`);
 };
@@ -88,9 +95,20 @@ module.exports.deletePost = async (req,res) =>{
     res.redirect('/posts');
 }
 
+module.exports.uploadTinyMCE = async (req, res) => {
+    if(req.file)
+    {   
+        res.json({url: req.file.path, filename: req.file.filename});
+    } else {
+        res.status(400).json({error: 'Image upload failed'})
+    }
+}
 
-
-
+module.exports.deleteTinyMCE = async (req,res) => {
+    const filename = decodeURIComponent(req.params.filename)
+    console.log(filename);
+    await cloudinary.uploader.destroy(filename);
+}
 // module.exports.addLike = async (req,res) => {
 //     const id = req.params.id;
 //     const post = await Post.findById(id);

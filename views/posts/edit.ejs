@@ -4,36 +4,113 @@
 </div>
 <div class="container mt-2" style="width: 80%;">     
     <h2>Edit Your Post</h2>     
-    <form id="postForm" action="/posts/<%= post._id %>?_method=PUT" method="post" enctype="multipart/form-data">         
+    <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post" enctype="multipart/form-data">         
         <div class="mb-3">             
             <label for="title" class="form-label">Post Title</label>             
             <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">              
             <p><%= post.title %></p>         
         </div>         
         <div class="mb-3">             
-            <label for="content" class="form-label">Post Content</label>             
-            <textarea class="form-control" id="content" name="post[content]" rows="5" required><%= post.content %></textarea>         
-        </div>         
-        <div class="mb-3">             
             <label for="type" class="form-label">Post Category</label>             
             <input type="text" class="form-control" id="type" name="post[type]" required value="<%= post.type %>">         
         </div>         
-
-        <div class="mb-3">
-            <label for="formFile" class="form-label"><h5>Upload your pictures (Max: 5)</h5></label>
-            <input class="form-control" type="file" id="formFile" name="images" multiple>
-            <small class="form-text text-muted">We will take only 5 pictures</small>
-        </div>               
-        <div class="mb-3">
-            <% post.images.forEach(function(img,i) { %>
-                <img src="<%=img.url%>" class ="img-thumbnail"alt="">
-                <div class="form-check-inline">
-                    <input type="checkbox"  id="img-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
-                </div>
-                <label for="img-<%=i%>">Delete?</label>
-            <% }) %>
-        </div>
-
-        <button class="btn btn-success" type="submit">Update your image</button>
+        <div class="mb-3">             
+            <label for="content" class="form-label">Post Content</label>             
+            <textarea class="form-control" id="tinymce-content" name="post[content]" rows="5" required><%= post.content %></textarea>         
+        </div>    
+        <input type="hidden" name="newImages" id="newsImages">
+        <input type="hidden" name="deletedImages" id="deletedImages">
+        <button class="btn btn-success" type="submit" id="submit-button">Update </button>
     </form> 
 </div>
+<!-- Script element sourcing TinyMCE -->
+<script type="application/javascript" src= "/tinymce/tinymce.min.js"></script>
+<!-- Script element sourcing the TinyMCE configuration -->
+<script type="application/javascript">
+    let imagesToUploadBlob = []; // Array to keep images locally
+    let imagesOfPost = <%- JSON.stringify(post.images) %>;  
+    let deleteImages = [];
+
+    tinymce.init({
+        selector: 'textarea#tinymce-content',
+        plugins: 'image link code table lists preview wordcount fullscreen emoticons',
+        toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+                 'bullist numlist outdent indent | link image | code preview fullscreen | emoticons',
+
+        images_upload_handler: async function (blobInfo, progress) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const blobUrl = URL.createObjectURL(blobInfo.blob());
+                    imagesToUploadBlob.push({
+                        blob: blobInfo.blob(),
+                        url: blobUrl,
+                    });
+                    resolve(blobUrl); 
+                };
+                reader.onerror = () => reject({ message: 'Image upload failed' });
+                reader.readAsDataURL(blobInfo.blob());
+            });
+        },
+    });
+
+    document.querySelector('#submit-button').addEventListener('click', async (evt) => {
+        evt.preventDefault();
+        const button = document.querySelector('#submit-button');
+        button.disabled = true;
+        let content = tinymce.activeEditor.getContent();
+        
+        try {
+            // Make a list of all images in content
+            const currentImagesInContent = Array.from(tinymce.activeEditor.getDoc().querySelectorAll('img')).map(img => img.src);
+           
+
+            //Filter out the ones that is still in content
+            const imagesToUpload = imagesToUploadBlob.filter(image => currentImagesInContent.includes(image.url));
+
+            //Check if any of the post images has been deleted
+            imagesOfPost.forEach(image => {
+                if (!currentImagesInContent.includes(image.url)) {
+                    deleteImages.push(image.filename); 
+                }
+            });
+
+            //Upload to cloudinary
+            const uploadResults = await Promise.all(imagesToUpload.map(image => sendImageToCloud(image.blob)));
+
+            //Replace Image url ( blob:source) to cloudinary url
+            uploadResults.forEach((result, index) => {
+                const { url, filename } = result;
+                content = content.replace(imagesToUpload[index].url, url);
+            });
+
+            // Set new uploaded images 
+            const images = uploadResults.map(({ url, filename }) => ({ url, filename }));
+            document.querySelector('#newsImages').value = JSON.stringify(images);
+
+            // Set deleted images 
+            document.querySelector('#deletedImages').value = JSON.stringify(deleteImages);
+
+            document.querySelector('#editForm').submit();
+        } catch (error) {
+            console.error("Failed to upload image(s):", error);
+        }
+    });
+
+    async function sendImageToCloud(imageBlob) {
+        const url = '/api/imageHandler/upload';
+        const formData = new FormData();
+        formData.append('image', imageBlob, 'image.jpg');
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        const result = await response.json();
+        return result;
+    }
+</script>

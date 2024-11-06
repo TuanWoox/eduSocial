@@ -40,7 +40,7 @@
                                         <a href="/posts/<%= post._id %>" class="text-decoration-none">
                                             <h5 class="card-title"><%= post.title %></h5>
                                         </a>
-                                        <p class="card-text"><%= post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content %></p> <!-- Truncate long content -->
+                                        <!-- <p class="card-text"><%= post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content %></p> Truncate long content -->
                                         <small>Category: <%= post.type %></small>
                                         <div class="d-flex set mt-2">
                                             <a class="card-link btn btn-success me-2" href="/posts/<%= post._id %>">Xem chi tiết</a>

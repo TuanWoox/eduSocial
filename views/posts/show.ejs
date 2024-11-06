@@ -9,28 +9,8 @@
     </div>
     
     <p class="mb-0"><strong>Nội dung:</strong></p>
-    <p class="m-2"><%= post.content %></p>
-    
-    <% if (post.images && post.images.length > 0) { %>
-        <div id="postCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 600px; margin: auto;">
-            <div class="carousel-inner">
-                <% post.images.forEach((image, index) => { %>
-                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                        <img src="<%= image.url %>" class="d-block w-100" alt="Image" style="height: 400px; object-fit: cover;">
-                    </div>
-                <% }) %>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#postCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#postCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-    <% } %>
-    
+    <p class="m-2"><%- post.content %></p>
+
     <div class="d-flex set mt-3">
         <a class="card-link btn btn-info me-2" href="/posts/<%= post._id %>/edit">Edit</a> 
         <form action="/posts/<%= post._id %>?_method=DELETE" method="POST">

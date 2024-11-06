@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { cloundinary, cloudinary } = require('../cloudinary/postCloud');
-
 const PostSchema = new Schema({
     name:{
         type: String,
@@ -28,22 +26,10 @@ const PostSchema = new Schema({
         type: Number,
         default: 0
     },
-    images : [ {
-        url: 
-        {
-            type: String,
-            required: true
-        },
-        filename: {
-            type: String,
-            required: true
-        }
-    }]
+    images: [{
+        url: { type: String},
+        filename: { type: String }
+    }],
 });
-// PostSchema.post('save', function (next) {
-//     console.log('New post created');
-//     next(); 
-// });
 const Post = mongoose.model('Post',PostSchema);
-
 module.exports = Post;
