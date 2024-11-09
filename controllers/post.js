@@ -1,4 +1,4 @@
-const Post = require('../models/Post');
+const Post = require('../models/Post'); 
 const path = require('path');
 const fs = require('fs');
 const { cloudinary } = require('../cloudinary/postCloud');
@@ -11,7 +11,7 @@ const topic = {
 //This is for post index
 module.exports.viewPost = async (req, res) => {
     try {
-        const post = await Post.find(); // Đợi kết quả truy vấn với `await`
+        const post = await Post.find() // Đợi kết quả truy vấn với `await`
         res.render('posts/index', { post, topic }); // Render view với dữ liệu
     } catch (err) {
         console.error(err); // Log lỗi nếu xảy ra
@@ -42,7 +42,7 @@ module.exports.createPost = async(req,res) =>{
 //This is for viewing a particular post
 module.exports.viewAPost = async (req, res) => {
     const id = req.params.id;
-    const post = await Post.findById(id);
+    const post = await Post.findById(id).populate('comments');
     if (!post) {
         return res.status(404).send('Post not found');
     }
