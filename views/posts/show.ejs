@@ -1,38 +1,48 @@
 <% layout('./layouts/indexboilerplate') -%>
-<div class="post">
-    <a href="/posts/" class="btn btn-primary"> Back to Post List</a>
-    <h1><%= post.title %></h1>
+<div class="container mt-4">
+    <!-- Back to Post List Button -->
+    <a href="/posts/" class="btn btn-outline-primary mb-3"><i class="bi bi-arrow-left-circle"></i> Back to Post List</a>
     
-    <div class="d-flex">
-        <p class="mb-0"><strong>Tác giả:</strong> <%= post.name %></p>
-        <p class="ms-2"><strong>Lượt xem:</strong> <%= post.views %></p>
+    <!-- Post Title -->
+    <h1 class="display-4 text-primary mb-4"><%= post.title %></h1>
+
+    <!-- Post Info (Author and Views) -->
+    <div class="d-flex mb-4">
+        <p class="mb-0 text-muted me-3"><strong>Tác giả:</strong> <%= post.name %></p>
+        <p class="mb-0 text-muted"><strong>Lượt xem:</strong> <%= post.views %></p>
     </div>
+
+    <!-- Post Content -->
     <div>
-    <p class="mb-0"><strong>Nội dung:</strong></p>
-    <p class="m-2"><%- post.content %></p>
+        <p class="h5 font-weight-bold">Nội dung:</p>
+        <p class="lead m-2"><%- post.content %></p>
     </div>
-    <div class="d-flex set mt-3 justify-content-between">
-        <a class="card-link btn btn-info me-2" href="/posts/<%= post._id %>/edit">Edit</a> 
+
+    <!-- Edit and Delete Buttons -->
+    <div class="d-flex justify-content-between mt-4">
+        <a class="btn btn-info btn-lg" href="/posts/<%= post._id %>/edit">Edit</a> 
         <form action="/posts/<%= post._id %>?_method=DELETE" method="POST">
-            <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="submit" class="btn btn-danger btn-lg">Delete</button>
         </form>
     </div>
+
     <!-- Answers Section -->
     <% if (post.comments && post.comments.length > 0) { %>
-        <div class="mt-5 ">
-            <h3>Answers (<%= post.comments.length %>)</h3>
+        <div class="mt-5">
+            <h3 class="h4 mb-3">Answers (<%= post.comments.length %>)</h3>
             <% post.comments.forEach(comment => { %>
-                <div class="card my-3">
-                    <div class="card-body d-flex flex-column">
+                <div class="card my-3 shadow-sm">
+                    <div class="card-body">
                         <small class="text-muted">
                             Answered by <strong><%= comment.authorId ? comment.authorId.name : 'Unknown' %></strong> on <%= new Date(comment.createdAt).toLocaleDateString() %>
                         </small>
-                        <p><%= comment.body %></p>
-                
+                        <p class="mt-2"><%= comment.body %></p>
+
+                        <!-- Edit and Delete Answer Buttons -->
                         <div class="d-flex justify-content-end">
-                            <a href="/posts/<%=post._id%>/editAnswer/<%=comment._id%>" class="btn btn-primary btn-sm me-2">Edit</a>
-                            <form action="/posts/<%=post._id%>/<%=comment._id%>?_method=DELETE" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <a href="/posts/<%= post._id %>/editAnswer/<%= comment._id %>" class="btn btn-outline-primary btn-sm me-2">Edit</a>
+                            <form action="/posts/<%= post._id %>/<%= comment._id %>?_method=DELETE" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -40,15 +50,16 @@
             <% }); %>
         </div>
     <% } %>
+
     <!-- Answer Form -->
     <div class="mt-4">
-        <h4>Post Your Answer</h4>
+        <h4 class="h5 font-weight-bold mb-3">Post Your Answer</h4>
         <form action="/posts/<%= post._id %>/sendAnswers" method="POST">
             <div class="mb-3">
                 <label for="answer" class="form-label">Your Answer</label>
                 <textarea id="answer" name="answer[body]" class="form-control" rows="5" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary btn-lg">Submit Answer</button>
         </form>
     </div>
 </div>

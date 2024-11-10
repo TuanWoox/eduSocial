@@ -32,7 +32,7 @@ router.route('/:id/edit')
 router.route('/:id')
 .get(CatchAsync(postController.viewAPost))
 .delete(CatchAsync(postController.deletePost))
-.put(upload.array('images',5),CatchAsync(postController.editPost));
+.put(CatchAsync(postController.editPost));
 
 // router.get('/:id/like',CatchAsync(postController.addLike))
 

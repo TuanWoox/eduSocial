@@ -25,7 +25,7 @@ module.exports.sendAnswer = async (req, res) => {
 module.exports.formEditAnswer = async (req,res) => {
     const id = req.params.commentID;
     const comment = await QuestionComment.findById(id); // Pass id directly
-    res.render('questioncomments/edit', {topic,comment});
+    res.render('questions/editQuestionComment', {topic,comment});
 }
 module.exports.editAnswer = async (req, res) => {
     const  id = req.params.commentID; 

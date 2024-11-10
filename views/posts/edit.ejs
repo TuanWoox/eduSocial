@@ -4,7 +4,7 @@
 </div>
 <div class="container mt-2" style="width: 80%;">     
     <h2>Edit Your Post</h2>     
-    <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post" enctype="multipart/form-data">         
+    <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post">         
         <div class="mb-3">             
             <label for="title" class="form-label">Post Title</label>             
             <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">              
@@ -30,6 +30,7 @@
     let imagesToUploadBlob = []; // Array to keep images locally
     let imagesOfPost = <%- JSON.stringify(post.images) %>;  
     let deleteImages = [];
+    
 
     tinymce.init({
         selector: 'textarea#tinymce-content',
@@ -55,43 +56,44 @@
     });
 
     document.querySelector('#submit-button').addEventListener('click', async (evt) => {
-        evt.preventDefault();
-        const button = document.querySelector('#submit-button');
-        button.disabled = true;
-        let content = tinymce.activeEditor.getContent();
-        
-        try {
-            // Make a list of all images in content
-            const currentImagesInContent = Array.from(tinymce.activeEditor.getDoc().querySelectorAll('img')).map(img => img.src);
-           
+    evt.preventDefault();
+    const button = document.querySelector('#submit-button');
+    button.disabled = true;
+    let content = tinymce.activeEditor.getContent();
 
-            //Filter out the ones that is still in content
-            const imagesToUpload = imagesToUploadBlob.filter(image => currentImagesInContent.includes(image.url));
+    try {
+        // Make a list of all images in content
+        const currentImagesInContent = Array.from(tinymce.activeEditor.getDoc().querySelectorAll('img')).map(img => img.src);
 
-            //Check if any of the post images has been deleted
-            imagesOfPost.forEach(image => {
-                if (!currentImagesInContent.includes(image.url)) {
-                    deleteImages.push(image.filename); 
-                }
-            });
+        // Filter out the ones that are still in content
+        const imagesToUpload = imagesToUploadBlob.filter(image => currentImagesInContent.includes(image.url));
 
-            //Upload to cloudinary
-            const uploadResults = await Promise.all(imagesToUpload.map(image => sendImageToCloud(image.blob)));
+        // Check if any of the post images have been deleted
+        imagesOfPost.forEach(image => {
+            if (!currentImagesInContent.includes(image.url)) {
+                deleteImages.push(image.filename); 
+            }
+        });
 
-            //Replace Image url ( blob:source) to cloudinary url
-            uploadResults.forEach((result, index) => {
-                const { url, filename } = result;
-                content = content.replace(imagesToUpload[index].url, url);
-            });
+        // Upload to Cloudinary
+        const uploadResults = await Promise.all(imagesToUpload.map(image => sendImageToCloud(image.blob)));
 
-            // Set new uploaded images 
-            const images = uploadResults.map(({ url, filename }) => ({ url, filename }));
-            document.querySelector('#newsImages').value = JSON.stringify(images);
+        // Replace Image URL (blob: source) to Cloudinary URL
+        uploadResults.forEach((result, index) => {
+            const { url, filename } = result;
+            content = content.replace(imagesToUpload[index].url, url);
+        });
 
-            // Set deleted images 
-            document.querySelector('#deletedImages').value = JSON.stringify(deleteImages);
+        tinymce.activeEditor.setContent(content);
 
-            document.querySelector('#editForm').submit();
+        // Set new uploaded images 
+        const images = uploadResults.map(({ url, filename }) => ({ url, filename }));
+        document.querySelector('#newsImages').value = JSON.stringify(images);
+
+        // Set deleted images 
+        document.querySelector('#deletedImages').value = JSON.stringify(deleteImages);
+
+        document.querySelector('#editForm').submit();
         } catch (error) {
             console.error("Failed to upload image(s):", error);
         }

@@ -1,0 +1,32 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="container mt-4">
+  <h2>Create a New Course</h2>
+  <form action="/courses/create" method="POST" enctype="multipart/form-data">
+    <!-- Title Field -->
+    <div class="mb-3">
+      <label for="title" class="form-label">Course Title</label>
+      <input type="text" id="title" name="course[title]" class="form-control" required>
+    </div>
+
+    <!-- Description Field -->
+    <div class="mb-3">
+      <label for="description" class="form-label">Course Description</label>
+      <textarea id="description" name="course[description]" class="form-control" rows="4" required></textarea>
+    </div>
+
+    <!-- Thumbnail Field -->
+    <div class="mb-3">
+      <label for="coursethumbnail" class="form-label">Course Thumbnail</label>
+      <input type="file" id="coursethumbnail" name="coursethumbnail" class="form-control" accept="image/*">
+    </div>
+
+    <!-- Tags Field -->
+    <div class="mb-3">
+        <label for="tags" class="form-label">Tags (seperated by space)</label>
+        <input type="text" class="form-control" id="tags" name="course[tags]">
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Create Course</button>
+  </form>
+</div>

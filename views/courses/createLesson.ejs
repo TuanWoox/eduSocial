@@ -1,0 +1,104 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="container">
+    <a href="/courses/<%=courseID%>" class="btn btn-sm btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to course</a>
+    <h1>Tạo bài học mới</h1>
+
+    <!-- Form for Creating Post -->
+    <form id="post-create-form" action="/courses/<%=courseID%>/createLesson" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3">
+            <label for="title" class="form-label"><h5>Tiêu đề bài học</h5></label>
+            <input type="text" id="title" name="course[title]" class="form-control" placeholder="Enter your course title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="content"><h5>Điều chỉnh bài học của bạn tại đây  </h5></label>
+            <textarea class="form-control" name="course[content]" id="tinymce-content" rows="5" placeholder="Nhập vào bài học của bạn" required></textarea>
+        </div>
+        
+        <!-- Add a hidden input to store images -->
+        <input type="hidden" name="course[images]" id="images-input">
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-button" class="btn btn-info">Create Lesson</button>
+    </form>
+</div>
+<!-- Script element sourcing TinyMCE -->
+<script type="application/javascript" src= "/tinymce/tinymce.min.js"></script>
+<!-- Script element sourcing the TinyMCE configuration -->
+<script type="application/javascript">
+    let imagesToUploadBlob = []; // Array to keep images locally
+
+    tinymce.init({
+        selector: 'textarea#tinymce-content',
+        plugins: 'image link code table lists preview wordcount fullscreen emoticons',
+        toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+                 'bullist numlist outdent indent | link image | code preview fullscreen | emoticons',
+
+        images_upload_handler: async function (blobInfo, progress) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const blobUrl = URL.createObjectURL(blobInfo.blob());
+                    imagesToUploadBlob.push({
+                        blob: blobInfo.blob(),
+                        url: blobUrl,
+                    });
+                    resolve(blobUrl); 
+                };
+                reader.onerror = () => reject({ message: 'Image upload failed' });
+                reader.readAsDataURL(blobInfo.blob());
+            });
+        },
+    });
+
+    document.querySelector('#submit-button').addEventListener('click', async (evt) => {
+        evt.preventDefault();
+        const button = document.querySelector('#submit-button');
+        button.disabled = true;
+        let content = tinymce.activeEditor.getContent();
+        
+        try {
+            // Before uploading, filter out images that are no longer in the content, this is used for undo things
+            const currentImagesInContent = Array.from(tinymce.activeEditor.getDoc().querySelectorAll('img')).map(img => img.src);
+            const imagesToUpload = imagesToUploadBlob.filter(image => currentImagesInContent.includes(image.url));
+
+            // Upload all remaining images
+            const uploadResults = await Promise.all(imagesToUpload.map(image => sendImageToCloud(image.blob)));
+
+            // Replace each temporary URL with the real URL in the content
+            uploadResults.forEach((result, index) => {
+                const { url, filename } = result;
+                content = content.replace(imagesToUpload[index].url, url);
+            });
+
+            // Set updated images and content for the form submission
+            const images = uploadResults.map(({ url, filename }) => ({ url, filename }));
+            document.querySelector('#images-input').value = JSON.stringify(images);
+            tinymce.activeEditor.setContent(content);
+
+            // Add the image upload and content update action to the undo stack
+            tinymce.activeEditor.undoManager.add();
+
+            document.querySelector('#post-create-form').submit();
+        } catch (error) {
+            console.error("Failed to upload image(s):", error);
+        }
+    });
+
+    async function sendImageToCloud(imageBlob) {
+        const url = '/api/imageHandler/upload';
+        const formData = new FormData();
+        formData.append('image', imageBlob, 'image.jpg');
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        const result = await response.json();
+        return result;
+    }
+</script>

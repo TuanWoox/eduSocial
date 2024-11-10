@@ -16,27 +16,21 @@ const courseSchema = new Schema(
     //   ref: 'User'
     // },
     coursethumbnail: {
-      type: String,
+      url: {
+        type: String
+      },
+      filename: {
+        type: String
+      }
     },
     lessons: [
-      {
-        lessonTitle: {
-          type: String,
-          required: true
-        },
-        content: {
-          type: String,
-          required: true
-        },
-        resources: [String],
-        videourl: {
-          type: String,
-        }
-      }
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Lesson',
+        }      
     ],
     tags: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Tag'
+      type: String
     }],
     studentsEnrolled: [{
       type: Schema.Types.ObjectId,
