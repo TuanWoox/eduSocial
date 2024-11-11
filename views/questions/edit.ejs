@@ -1,20 +1,41 @@
 <% layout('layouts/indexboilerplate') -%>
 <div class="container mt-2" style="width: 80%;">
-    <h2>Edit Your Question</h2>
-    <form id="questionForm" action="/questions/<%=question._id%>?_method=PUT" method="post">
+    <h2>Chỉnh sửa câu hỏi của bạn</h2>
+    <form id="questionForm" action="/questions/<%= question.id %>?_method=PUT" method="post" novalidate class="validated-form">
         <div class="mb-3">
-            <label for="title" class="form-label">Question Title</label>
-            <input type="text" class="form-control" id="title" name="question[title]" required value="<%=question.title%>"> 
+            <label for="title" class="form-label">Tiêu đề câu hỏi</label>
+            <input type="text" class="form-control" id="title" name="question[title]" required value="<%=question.title%>">
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+            <div class="invalid-feedback">
+                Please provide a title for the question.
+            </div>
         </div>
+
         <div class="mb-3">
-            <label for="body" class="form-label">Question Body</label>
-            <!-- Place the content inside the <textarea> -->
-            <textarea class="form-control" id="body" name="question[body]" rows="5" required><%= question.body %></textarea>
+            <label for="body" class="form-label">Nội dung câu hỏi</label>
+            <textarea class="form-control" id="body" name="question[body]" rows="10" required><%= question.body %></textarea>
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+            <div class="invalid-feedback">
+                Please provide the content for the question.
+            </div>
         </div>
+
         <div class="mb-3">
-            <label for="tags" class="form-label">Tags (separated by space)</label>
-            <input type="text" class="form-control" id="tags" name="question[tags]" value="<%= question.tags.join(' ') %>">
-        </div>        
-        <button type="submit" class="btn btn-primary">Edit Your Question</button>
+            <label for="tags" class="form-label">Tags (cách nhau bằng dấu space)</label>
+            <input type="text" class="form-control" id="tags" name="question[tags]" required value="<%= question.tags.join(' ') %>">
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+            <div class="invalid-feedback">
+                Please provide at least one tag.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Chỉnh sửa câu hỏi</button>
+        <a href="/questions/<%= question._id  %>" class="btn btn-info">Hủy chỉnh sửa</a>
     </form>
 </div>

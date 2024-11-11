@@ -11,6 +11,7 @@ module.exports.sendAnswer = async (req, res) => {
     const newQuestionComment = new QuestionComment({
         ...req.body.answer, 
         commentedOnQuestion: id,
+        author: req.user._id
     });
     const question = await Question.findById(id);
     if (!question) {

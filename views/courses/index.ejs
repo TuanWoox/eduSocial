@@ -1,19 +1,4 @@
 <% layout('layouts/indexboilerplate') -%>
-
-<% if (success && Array.isArray(success) && success.length > 0) { %>
-  <div class="alert alert-success" style="width: 50%; margin: 0 auto;">
-    <%= success.join(', ') %>
-  </div>
-<% } %>
-
-<% if (error && Array.isArray(error) && error.length > 0) { %>
-  <div class="alert alert-danger" style="width: 50%; margin: 0 auto;">
-    <%= error.join(', ') %>
-  </div>
-<% } %>
-
-  
-
 <div class="row mt-4 p-4 m-auto justify-content-center">
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic.find %>" aria-label="Tìm kiếm" aria-describedby="basic-addon2">

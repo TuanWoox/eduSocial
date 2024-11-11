@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const userControl = require('../controllers/user');
 const passport = require('passport')
-const {storeReturnTo,isLoggedin} = require('../middleware/middleware');
+const {storeReturnTo,isLoggedin} = require('../middleware/checkMiddleware');
 
 
 
@@ -15,11 +15,9 @@ router.route('/login/googleAuth')
 
 router.route('/login/googleAuth/callback')
 .get(
-    passport.authenticate('google', { failureRedirect: '/login' }), 
-    (req, res) => {
-      req.flash('success', 'Welcome you to our site!!!');
-      res.redirect('/courses');
-    }
+    storeReturnTo,
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    userControl.loginUser
 );
 
 
@@ -29,16 +27,18 @@ router.route('/login/githubAuth')
 
 router.route('/login/githubAuth/callback')
 .get(
+  storeReturnTo,
   passport.authenticate('github', { failureRedirect: '/login' }),
-  (req, res) => {
-    req.flash('success', 'Welcome back!');
-    res.redirect('/courses');
-  }
+  userControl.loginUser
 );
 
 router.route('/login')
 .get(userControl.renderLoginForm)
-.post(storeReturnTo,passport.authenticate('local',{failureFlash: true, failureRedirect:'/users/login'}),userControl.loginUser)
+.post(
+  storeReturnTo,
+  passport.authenticate('local',{failureFlash: true, failureRedirect:'/users/login'}),
+  userControl.loginUser
+)
 
 // Google authentication (GET)
 

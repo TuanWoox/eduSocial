@@ -10,7 +10,6 @@ module.exports = new GitHubStrategy(
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      console.log(profile);
       // Check if a user with this GitHub ID already exists
       let user = await User.findOne({ githubId: profile.id });
       if (!user) {

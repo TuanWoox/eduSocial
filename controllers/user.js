@@ -22,11 +22,19 @@ module.exports.createLocalUser = async (req,res,next) => {
         return res.redirect('/users/register');
     }
 }
-module.exports.loginUser = (req,res) =>{
-    req.flash('success','Welcome back!!')
-    const redirectUrl = res.locals.returnTo || '/courses'
+module.exports.loginUser = (req, res) => {
+    req.flash('success', 'Welcome back!!');
+    const redirectUrl = res.locals.returnTo || '/courses';
+    // Reset returnTo from session if it exists
+    if (req.session.returnTo) {
+        delete req.session.returnTo;
+    }
+    // Clear returnTo from res.locals for the current request
+    res.locals.returnTo = '';
+    // Redirect to the chosen URL
     res.redirect(redirectUrl);
-}
+};
+
 module.exports.renderLoginForm = (req,res) => { 
     res.render('users/loginForm');
 }

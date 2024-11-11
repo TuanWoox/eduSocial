@@ -1,49 +1,138 @@
 <% layout('layouts/indexboilerplate') -%>
 
-<div class="row mt-4 p-4 m-auto justify-content-center">
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic.find %>" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
-        <div class="input-group-append">
-          <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
+<!-- Search Bar Section -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic.find %>" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+        </div>
+        <!-- Sorting Dropdown -->
+        <div class="col-md-4 col-lg-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sắp xếp theo
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li>
+                        <a class="dropdown-item" href="?page=<%= currentPage %>&sort=newest">Mới nhất</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="?page=<%= currentPage %>&sort=views">Lượt xem</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <a href="/questions/create" class="btn btn-primary ms-4" style="width: 15%;">Create question!</a>
-</div>
 
+<!-- Create Question Button Section -->
+<% if (currentUser) { %>
+<div class="container">
+    <div class="row justify-content-center">
+        <a href="/questions/create" class="btn btn-primary mb-4" style="width: 200px; text-align: center;">Tạo câu hỏi!</a>
+    </div>
+</div>
+<% } %>
+
+<!-- No Questions Message or List of Questions -->
 <% if (questions.length === 0) { %>
-    <p>No questions available. Be the first to ask one!</p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <p class="text-center"><strong>Chưa có bài viết nào <% if (currentUser) { %> Hãy trở thành người đầu tiên hỏi <% } %></strong></p>
+        </div>
+    </div>    
 <% } else { %>
-    <div class="row m-2">
-        <% for (let question of questions) { %>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="right-side text-start">
-                                <a href="/questions/<%= question._id %>" class="text-decoration-none">
-                                    <h5 class="card-title"><%= question.title %></h5>
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <% for (let question of questions) { %>
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="/questions/<%= question._id %>" class="text-decoration-none text-dark">
+                                    <%= question.title %>
                                 </a>
-                                <p class="card-text"><%= question.body.length > 100 ? question.body.substring(0, 100) + '...' : question.body %></p>
-    
-                                <div class="d-flex justify-content-between mt-3">
-                                    <div class="me-3">
-                                        <i class="bi bi-star-fill"></i> <span><%= question.upvotes - question.downvotes %></span>
-                                    </div>
-                                    <div class="me-3">
-                                        <i class="bi bi-pencil-fill"></i> <span><%= question.comments.length %></span>
-                                    </div>
-                                    <div>
-                                        <i class="bi bi-eye-fill"></i> <span><%= question.views %></span>
-                                    </div>
+                            </h5>
+                            <p class="card-text">
+                                <%= question.body.length > 100 ? question.body.substring(0, 100) + '...' : question.body %>
+                            </p>
+
+                            <!-- Author and Date Section -->
+                            <p class="text-muted mb-2">Bởi <strong><%= question.author.name %></strong> vào  <%= question.createdAt.toLocaleDateString() %> <%= question.createdAt.toLocaleTimeString() %></p>
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <div class="me-3">
+                                    <i class="bi bi-star-fill text-warning"></i> 
+                                    <span><%= question.upvotes - question.downvotes %></span>
+                                </div>
+                                <div class="me-3">
+                                    <i class="bi bi-pencil-fill"></i> 
+                                    <span><%= question.comments.length %></span>
+                                </div>
+                                <div>
+                                    <i class="bi bi-eye-fill"></i> 
+                                    <span><%= question.views %></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        <% } %>
-    </div>
+            <% } %>
+        </div>
+        <div class="d-flex justify-content-center">
+            <% if (totalPages > 1) { %> <!-- Show pagination only if there are multiple pages -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <!-- Previous button -->
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+        
+                        <!-- First page -->
+                        <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                            <a class="page-link" href="?page=1&sort=<%= sort %>">1</a>
+                        </li>
+        
+                        <!-- Left ellipsis -->
+                        <% if (currentPage > 4) { %>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <% } %>
+        
+                        <!-- Pages around the current page -->
+                        <% for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+                            </li>
+                        <% } %>
+        
+                        <!-- Right ellipsis -->
+                        <% if (currentPage < totalPages - 3) { %>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <% } %>
+        
+                        <!-- Last page -->
+                        <% if (totalPages > 1) { %>
+                            <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= totalPages %>&sort=<%= sort %>"><%= totalPages %></a>
+                            </li>
+                        <% } %>
+        
+                        <!-- Next button -->
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            <% } %>
+    </div>        
 <% } %>

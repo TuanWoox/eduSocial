@@ -3,6 +3,9 @@ if (process.env.NODE_ENV !== "production") {
   require('dotenv').config(); // Load .env only in development mode
 }
 
+
+// //require this dotenv will be for when we deploy
+// require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
@@ -17,12 +20,11 @@ const MongoStore = require('connect-mongo');
 const LocalStrategy = require('passport-local');
 const passportGoogle = require('./passportAuth/passportGoogle');
 const passportGithub = require('./passportAuth/passportGithub');
-
+const ExpressError = require('./utils/ExpressError');
 const dotenv = require('dotenv');
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/eduSocial';
 
-// Load Config
-dotenv.config();
+
 
 // Initialize Express
 const app = express();
@@ -117,11 +119,15 @@ app.use('/courses', courseRoutes);
 app.use('/questions', questionRoutes);
 app.use('/posts', postRoutes);
 
+app.all('*',(req,res,next) => {
+  next(new ExpressError('Page Not Found', 404))
+})
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).render('404');
-});
+app.use((err,req,res,next) => {
+  const {statusCode = 500} = err;
+  if(!err.message) err.message = 'Oh no, Something went wrong';
+  res.status(statusCode).render('error', { err });
+})
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
