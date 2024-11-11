@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="/stylesheet/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://kit.fontawesome.com/91f5be4707.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -12,7 +12,7 @@
     <title>Trang chính</title>
 </head>
 <body>
-    <header style="background-image: url(/background.jpg); background-size: cover; background-repeat: no-repeat;image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+    <header style="background-image: url(/pictures/background.jpg); background-size: cover; background-repeat: no-repeat;image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
         <nav class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -35,18 +35,34 @@
                         </div>
                     </div>
                 </form>
+                <% if (currentUser) { %>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Welcome,<span class="glyphicon glyphicon-user"><%= currentUser.username %>!</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul style="border-radius: 10px;" class="dropdown-menu">
+                                <li><a href="/logout"><i class="fa-solid fa-users-gear"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                <% } else{%>
                 <ul class="nav navbar-nav navbar-right">
+
                     <li class="dropdown">
+
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <span class="glyphicon glyphicon-user"></span> Tài khoản 
                             <span class="caret"></span>
                         </a>
                         <ul style="border-radius: 10px;" class="dropdown-menu">
-                            <li><a href="/api/"><i class="fa-solid fa-users-gear"></i>   Đăng nhập</a></li>
-                            <li><a href="/api/"><i class="fa-solid fa-user-plus"></i>   Đăng kí</a></li>
+                            <li><a href="/login"><i class="fa-solid fa-users-gear"></i> Đăng nhập</a></li>
+                            <li><a href="/register"><i class="fa-solid fa-user-plus"></i> Đăng kí</a></li>
                         </ul>
                     </li>
                 </ul>
+                <% } %>
             </div>
         </nav>
         <div class="header-content">
@@ -54,7 +70,7 @@
                 <p><strong>MẠNG XÃ HỘI GIÁO DỤC</strong></p>
                 <h2>Thư Viện Học Tập Hiệu Quả</h2>
                 <p>Lập trình?Kỹ Năng?Ngôn Ngữ?<br>Tất cả đều có ở đây</p>
-                <button class="head-btn"><a href="/user/courses">Học ngay</a></button>
+                <button class="head-btn"><a href="/courses">Học ngay</a></button>
             </div>
             <div class="header-right">
                 <div class="circle-outer">

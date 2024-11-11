@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const middleware = require('../middleware/authMiddleware');
 const CatchAsync = require('../utils/CatchAsync');
 const router = express.Router({mergeParams: true});
 const { storage } = require('../cloudinary/postCloud');
