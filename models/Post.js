@@ -10,15 +10,21 @@ const PostSchema = new Schema({
         type: String,
         required: [true , 'Hãy nhập tựa đề bài viết']
     },
-    type:{
-        type: String,
-        required: false
-    },
+    tags: [
+    {
+        type: String
+      }
+    ]
+    ,
     content:{
         type: String,
         required: [true,'Hãy nhập nội dung bài viết']
     },
-    like:{
+    upvotes: {
+        type: Number,
+        default: 0
+      },
+    downvotes: {
         type: Number,
         default: 0
     },
@@ -33,7 +39,12 @@ const PostSchema = new Schema({
     comments: [{
         type: Schema.Types.ObjectId,
         ref: 'PostComment'  
-    }]
-});
+    }],
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
+}, {timestamps: true});
 const Post = mongoose.model('Post',PostSchema);
 module.exports = Post;

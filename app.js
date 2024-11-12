@@ -16,6 +16,7 @@ const methodOverride = require('method-override');
 const path = require('path');
 const User = require('./models/User');
 const ejsMate = require('ejs-mate');
+const sanitizeHtml = require('sanitize-html');
 const MongoStore = require('connect-mongo');
 const LocalStrategy = require('passport-local');
 const passportGoogle = require('./passportAuth/passportGoogle');

@@ -1,15 +1,17 @@
 <% layout('./layouts/indexboilerplate') -%>
 <div class="container mt-4">
     <!-- Back to Post List Button -->
-    <a href="/posts/" class="btn btn-outline-primary mb-3"><i class="bi bi-arrow-left-circle"></i> Back to Post List</a>
+    
     
     <!-- Post Title -->
     <h1 class="display-4 text-primary mb-4"><%= post.title %></h1>
 
     <!-- Post Info (Author and Views) -->
     <div class="d-flex mb-4">
-        <p class="mb-0 text-muted me-3"><strong>Tác giả:</strong> <%= post.name %></p>
-        <p class="mb-0 text-muted"><strong>Lượt xem:</strong> <%= post.views %></p>
+        <p class="mb-0 text-muted me-3"><strong>Tác giả:</strong> <%= post.author.name %></p>
+        <p class="mb-0 text-muted me-3"><strong>Lượt xem:</strong> <%= post.views %></p>
+        <p class="mb-0 text-muted"><strong>Đăng vào:</strong> <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></p>
+
     </div>
 
     <!-- Post Content -->
@@ -17,7 +19,7 @@
         <p class="h5 font-weight-bold">Nội dung:</p>
         <p class="lead m-2"><%- post.content %></p>
     </div>
-
+    <% if(currentUser && post.author.equals(currentUser._id) ) {%>
     <!-- Edit and Delete Buttons -->
     <div class="d-flex justify-content-between mt-4">
         <a class="btn btn-info btn-lg" href="/posts/<%= post._id %>/edit">Edit</a> 
@@ -25,41 +27,148 @@
             <button type="submit" class="btn btn-danger btn-lg">Delete</button>
         </form>
     </div>
-
+    <% } %>
     <!-- Answers Section -->
+ 
     <% if (post.comments && post.comments.length > 0) { %>
         <div class="mt-5">
-            <h3 class="h4 mb-3">Answers (<%= post.comments.length %>)</h3>
+            <h3>Số bình luận (<%= totalComments %>)</h3>
             <% post.comments.forEach(comment => { %>
-                <div class="card my-3 shadow-sm">
-                    <div class="card-body">
-                        <small class="text-muted">
-                            Answered by <strong><%= comment.authorId ? comment.authorId.name : 'Unknown' %></strong> on <%= new Date(comment.createdAt).toLocaleDateString() %>
-                        </small>
-                        <p class="mt-2"><%= comment.body %></p>
-
-                        <!-- Edit and Delete Answer Buttons -->
-                        <div class="d-flex justify-content-end">
+                <div class="card my-3">
+                    <div class="card-body d-flex">
+                        
+                        <!-- Left Side: Author Image -->
+                        <div class="me-3 text-center">
+                            <img src="/pictures/user.png" alt="Author" class="rounded-circle" width="80" height="80">
+                            <small class="d-block mt-1"><strong><%= comment.author ? comment.author.name : 'Unknown' %></strong></small>
+                        </div>
+                        
+                        <!-- Right Side: Comment Content -->
+                        <div class="flex-grow-1">
+                            <!-- Comment Content -->
+                            <small class="text-muted d-block mb-3">
+                                Vào <strong><%= new Date(comment.createdAt).toLocaleDateString() %> <%= new Date(comment.createdAt).toLocaleTimeString() %> </strong>
+                            </small>
+    
+                            <% if (comment.replyTo) { %>
+                                <blockquote class="text-muted" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                                    <strong><%= comment.replyTo.author ? comment.replyTo.author.name : 'Unknown' %> nói:</strong>
+                                    <p><%= comment.replyTo.body %></p>
+                                </blockquote>
+                            <% } %>
+                            
+    
+                            <p><%= comment.body %></p>
+    
+                            <!-- Reply Button (Left side) -->
+                            <% if(currentUser) {%>
+                                <button class="btn btn-success btn-sm mt-2" onclick="setReplyCommentId('<%= comment._id %>', '<%= comment.author.name %>')">Reply</button>
+                            <% } %>
+                        </div>
+    
+                        <!-- Edit and Delete Buttons (Right side) -->
+                        <% if (currentUser && comment.author.equals(currentUser._id)) { %>
+                        <div class="d-flex flex-column justify-content-between ms-3">
                             <a href="/posts/<%= post._id %>/editAnswer/<%= comment._id %>" class="btn btn-outline-primary btn-sm me-2">Edit</a>
                             <form action="/posts/<%= post._id %>/<%= comment._id %>?_method=DELETE" method="POST" class="d-inline">
                                 <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
                             </form>
                         </div>
+                        <% } %>
                     </div>
-                </div>                
+                </div>
             <% }); %>
         </div>
     <% } %>
 
+    <div class="d-flex justify-content-center">
+        <% if (totalPages > 1) { %> <!-- Show pagination only if there are multiple pages -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- Previous button -->
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+        
+                    <!-- First page -->
+                    <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                        <a class="page-link" href="?page=1">1</a>
+                    </li>
+        
+                    <!-- Left ellipsis -->
+                    <% if (currentPage > 4) { %>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <% } %>
+        
+                    <!-- Pages around the current page -->
+                    <% for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Right ellipsis -->
+                    <% if (currentPage < totalPages - 3) { %>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <% } %>
+        
+                    <!-- Last page -->
+                    <% if (totalPages > 1) { %>
+                        <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Next button -->
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        <% } %>
+    </div> 
+
     <!-- Answer Form -->
-    <div class="mt-4">
-        <h4 class="h5 font-weight-bold mb-3">Post Your Answer</h4>
-        <form action="/posts/<%= post._id %>/sendAnswers" method="POST">
-            <div class="mb-3">
-                <label for="answer" class="form-label">Your Answer</label>
-                <textarea id="answer" name="answer[body]" class="form-control" rows="5" required></textarea>
+    <% if(currentUser) {%>
+        <div class="mt-4" id="yourCommentSection">
+            <h4>Bình luận của bạn</h4>
+            
+            <!-- Replying to Label (Initially Hidden) -->
+            <div id="replyLabel" class="text-secondary mb-2" style="display: none;">
+                <strong>Trả lời <span id="replyAuthor"></span> </strong>
+                <button type="button" onclick="clearReply()" class="btn btn-danger btn-sm">Delete</button>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg">Submit Answer</button>
-        </form>
-    </div>
+            
+            <form action="/posts/<%= post._id %>/sendAnswers" novalidate class="validated-form" method="POST">
+                <!-- Hidden Input for Comment ID -->
+                <input type="hidden" id="replyTo" name="answer[replyTo]" value="">
+        
+                <div class="mb-3">
+                    <label for="answer" class="form-label">Nội dung bình luận</label>
+                    <textarea id="answer" name="answer[body]" class="form-control" rows="5" required ></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+            </form>
+        </div>
+    <% } %> 
+    <a href="/posts/" class="btn btn-outline-primary mb-3"><i class="bi bi-arrow-left-circle"></i> Back to Post List</a>
 </div>
+
+<script>
+    // JavaScript function to set the hidden input's value and display the reply label
+    function setReplyCommentId(commentId, authorName) {
+        document.getElementById('replyTo').value = commentId;
+        document.getElementById('replyAuthor').textContent = authorName;
+        document.getElementById('replyLabel').style.display = 'block';
+    }
+
+    // Function to clear the reply label and hidden input field
+    function clearReply() {
+        document.getElementById('replyTo').value = '';
+        document.getElementById('replyLabel').style.display = 'none';
+    }
+</script>

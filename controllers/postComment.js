@@ -7,18 +7,26 @@ const topic = {
     find: 'bài viết'
 }
 module.exports.sendAnswer = async (req, res) => {
-    const id = req.params.id;;
-    const newPostComment = new postComment({
-        ...req.body.answer, 
+    const id = req.params.id;
+    const { body, replyTo } = req.body.answer;
+    // Initialize the object for creating the new comment
+    const newPostCommentData = {
         commentedOnPost: id,
-    });
-    const post = await Post.findById(id);
-    if (!post) {
-        return res.status(404).send("Post not found");
+        author: req.user._id,
+        body // Always include the body
+    };
+    // If replyTo is not an empty string, add it to the new comment data
+    if (replyTo && replyTo !== '') {
+        newPostCommentData.replyTo = replyTo; // Add replyTo only if it's not empty
     }
-    post.comments.push(newPostComment._id); // Push the comment ID
+    const newPostComment = new postComment(newPostCommentData);
+    //Find the post to insert the comment in
+    const post = await Post.findById(id);
+    //Push the comments
+    post.comments.push(newPostComment._id); 
     await newPostComment.save();
     await post.save();
+    req.flash('success', 'Bình luận thành công');
     res.redirect(`/posts/${id}`);
 };
 module.exports.formEditAnswer = async (req,res) => {

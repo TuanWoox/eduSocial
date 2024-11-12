@@ -5,11 +5,11 @@ const postCommentSchema = new Schema({
         type: String,
         required: true
     },
-    // authorId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true
-    // },
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     upvotes: {
         type: Number,
         default: 0
@@ -20,10 +20,10 @@ const postCommentSchema = new Schema({
     },
     // upvotedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     // downvotedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    // replies: [{
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'QuestionComment'
-    // }],
+    replyTo: {
+        type: Schema.Types.ObjectId,
+        ref: 'PostComment'
+    },
     // isDeleted: {
     //     type: Boolean,
     //     default: false

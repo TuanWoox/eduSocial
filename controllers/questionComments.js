@@ -7,16 +7,21 @@ const topic = {
     find: 'câu hỏi'
 }
 module.exports.sendAnswer = async (req, res) => {
-    const id = req.params.id;;
-    const newQuestionComment = new QuestionComment({
-        ...req.body.answer, 
+    const id = req.params.id;
+    const { body, replyTo } = req.body.answer;
+    // Initialize the new comment data object with required fields
+    const newQuestionCommentData = {
         commentedOnQuestion: id,
-        author: req.user._id
-    });
-    const question = await Question.findById(id);
-    if (!question) {
-        return res.status(404).send("Question not found");
+        author: req.user._id,
+        body, // Always include the body
+    };
+    // Only include replyTo if it's not an empty string
+    if (replyTo && replyTo !== '') {
+        newQuestionCommentData.replyTo = replyTo;
     }
+    // Create the new question comment
+    const newQuestionComment = new QuestionComment(newQuestionCommentData)
+    const question = await Question.findById(id);
     question.comments.push(newQuestionComment._id); // Push the comment ID
     await newQuestionComment.save();
     await question.save();

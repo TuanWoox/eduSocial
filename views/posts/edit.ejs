@@ -6,16 +6,15 @@
     <h2>Edit Your Post</h2>     
     <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post">         
         <div class="mb-3">             
-            <label for="title" class="form-label">Post Title</label>             
-            <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">              
-            <p><%= post.title %></p>         
+            <label for="title" class="form-label"><h5>Tiêu đề của bài đăng</h5></label>             
+            <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">                      
+        </div>         
+        <div class="mb-3">                        
+            <label for="tags" class="form-label"><h5>Tags (cách nhau bằng dấu space)</h5></label>
+            <input type="text" class="form-control" id="tags" name="post[tags]" required value="<%= post.tags.join(' ') %>">       
         </div>         
         <div class="mb-3">             
-            <label for="type" class="form-label">Post Category</label>             
-            <input type="text" class="form-control" id="type" name="post[type]" required value="<%= post.type %>">         
-        </div>         
-        <div class="mb-3">             
-            <label for="content" class="form-label">Post Content</label>             
+            <label for="content" class="form-label"><h5>Nội dung post</h5></label>             
             <textarea class="form-control" id="tinymce-content" name="post[content]" rows="5" required><%= post.content %></textarea>         
         </div>    
         <input type="hidden" name="newImages" id="newsImages">

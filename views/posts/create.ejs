@@ -1,36 +1,23 @@
 <% layout('layouts/indexboilerplate') -%>
-<div class="container mt-4">
-    <div class="breadcrumb mb-3 d-flex align-items-center">
-        <i class="fa-solid fa-house me-2"></i> =>
-        <p class="mb-0">Bài Viết</p>=>
-        <p class="mb-0">Tạo bài viết</p>
-    </div>
-</div>
 <div class="container">
-    <h1>Create a New Post</h1>
-    <a href="/posts" class="btn btn-sm btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Posts</a>
+    <h1>Tạo 1 bài viết</h1>
+    
 
     <!-- Form for Creating Post -->
     <form id="post-create-form" action="/posts/create" method="post" enctype="application/x-www-form-urlencoded">
         <div class="mb-3">
-            <label for="title" class="form-label"><h5>Post Title</h5></label>
-            <input type="text" id="title" name="post[title]" class="form-control" placeholder="Enter your post title" required>
+            <label for="title" class="form-label"><h5>Tiêu đề bài viết</h5></label>
+            <input type="text" id="title" name="post[title]" class="form-control" placeholder="Nhập vào tiêu đề của bạn" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="title" class="form-label"><h5>Tags bài viết( Viết cách nhau bằng dấu cách )</h5></label>
+            <input type="text" id="title" name="post[tags]" class="form-control" placeholder="Nhập vào tags của bạn" required>
         </div>
 
         <div class="form-group">
-            <label for="category"><h5>Category</h5></label>
-            <select class="form-control" id="category" name="post[type]" required>
-                <option value="" disabled selected>Select a category</option>
-                <option value="Technology">Technology</option>
-                <option value="Science">Science</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Education">Education</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="content"><h5>Custom your content here ( Not allow drag and drop ) </h5></label>
-            <textarea class="form-control" name="post[content]" id="tinymce-content" rows="5" placeholder="Write your post content here..." required></textarea>
+            <label for="content"><h5>Chỉnh sửa nội dung của bạn tại đây </h5></label>
+            <textarea class="form-control" name="post[content]" id="tinymce-content" rows="5" placeholder="Viết nội dung của bạn..." required></textarea>
         </div>
         
         <!-- Add a hidden input to store images -->
@@ -39,6 +26,7 @@
         <!-- Submit Button -->
         <button type="submit" id="submit-button" class="btn btn-info">Publish Post</button>
     </form>
+    <a href="/posts" class="btn btn-sm btn-secondary mt-2"><i class="fa-solid fa-arrow-left"></i> Trở về trang bài viết</a>
 </div>
 <!-- Script element sourcing TinyMCE -->
 <script type="application/javascript" src= "/tinymce/tinymce.min.js"></script>

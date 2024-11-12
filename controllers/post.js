@@ -1,6 +1,5 @@
 const Post = require('../models/Post'); 
-const path = require('path');
-const fs = require('fs');
+const PostComment = require('../models/postcomment');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Bài viết',
@@ -10,13 +9,47 @@ const topic = {
 
 //This is for post index
 module.exports.viewPost = async (req, res) => {
-    try {
-        const post = await Post.find() // Đợi kết quả truy vấn với `await`
-        res.render('posts/index', { post, topic }); // Render view với dữ liệu
-    } catch (err) {
-        console.error(err); // Log lỗi nếu xảy ra
-        res.status(500).send('Lỗi trong việc lấy bài viết từ cơ sở dữ liệu'); // Gửi phản hồi lỗi nếu có sự cố
+
+    const page = parseInt(req.query.page) || 1;
+    const postsPerPage = 15;
+
+    // Default sorting by newest
+    let sortBy = { createdAt: -1 };  // Sorting by newest by default
+    let sort = 'newest'; // Default sort option
+
+    // Check if sorting by views is requested
+    if (req.query.sort === 'views') {
+        sortBy = { views: -1 };  // Sort by views in descending order
+        sort = 'views';
     }
+     // Check if sorting by activity is requested
+    if(req.query.sort ==='activity')
+    {
+        sortBy = {updatedAt: -1};
+        sort = 'activity'
+    }
+
+    // Fetch post with the selected sort order
+    const post = await Post.find().populate({
+        path: 'author',
+        select: 'name _id'
+    })
+    .sort(sortBy)  // Apply the sorting
+    .skip((page - 1) * postsPerPage)  // Skip post for previous pages
+    .limit(postsPerPage);  // Limit to the number of post per page
+
+    // Get the total count of posts for pagination
+    const totalPosts = await Post.countDocuments();
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+    // Render the page with the necessary data
+    res.render('posts/index', {
+        topic,
+        post,
+        currentPage: page,
+        totalPages,
+        sort  // Pass the current sort option to the template
+    });
 };
 
 //This is for viewing the form the create the post
@@ -27,28 +60,63 @@ module.exports.viewCreate = (req,res) => {
 //This is for posting a post
 module.exports.createPost = async(req,res) =>{
     const {title,content,type,images} = req.body.post;
+    const tagsArray = req.body.post.tags.split(' ').filter(tag => tag.trim() !== '');
     const imagesParsed = JSON.parse(images);
     const newPost = new Post({
         title,
         content,
         type,
         images: imagesParsed,
+        author: req.user._id,
+        tags: tagsArray
     });
-   
     await newPost.save();
+    req.flash('success', 'Tạo bài mới thành công!!!');
     res.redirect(`/posts/${newPost._id}`);
 }
 
 //This is for viewing a particular post
 module.exports.viewAPost = async (req, res) => {
-    const id = req.params.id;
-    const post = await Post.findById(id).populate('comments');
-    if (!post) {
-        return res.status(404).send('Post not found');
-    }
+    const page = parseInt(req.query.page) || 1;
+    const commentsPerPage = 10;
+    const post = await Post.findById(req.params.id)
+    .populate({
+        path: 'author',
+        select: 'name _id',
+    })
+    .populate({
+        path: 'comments',
+        options: {
+            limit: commentsPerPage,
+            skip: (page - 1) * commentsPerPage,
+        },
+        populate: [
+            {
+                path: 'author',
+                select: 'name _id',
+            },
+            {
+                path: 'replyTo',
+                populate: {
+                    path: 'author',
+                    select: 'name _id',
+                },
+                select: '_id body',
+            }
+        ]
+    });
     post.views += 1; // Tăng lượt xem mỗi khi người dùng truy cập
     await post.save();
-    res.render('posts/show', {post, topic});
+    const totalComments = await PostComment.countDocuments({commentedOnPost: post._id});
+    const totalPages = Math.ceil(totalComments/commentsPerPage);
+
+    res.render('posts/show', {
+        topic,
+        post, 
+        currentPage: page,
+        totalPages,
+        totalComments
+    });
 };
 
 // Hiển thị form chỉnh sửa bài viết
@@ -64,10 +132,12 @@ module.exports.viewEdit = async (req, res) => {
 // Xử lý chỉnh sửa bài viết
 module.exports.editPost = async (req, res) => {
     const id = req.params.id;
+    const tagsArray = req.body.post.tags.split(' ').filter(tag => tag.trim() !== '');
     const newData = {
         title: req.body.post.title,
         type: req.body.post.type,
         content: req.body.post.content,
+        tags: tagsArray
     }
     const post = await Post.findByIdAndUpdate(req.params.id, newData, { new: true, runValidators: true });
     const imgs = JSON.parse(req.body.newImages);
@@ -92,6 +162,7 @@ module.exports.deletePost = async (req,res) =>{
     {
         await cloudinary.uploader.destroy(image.filename);
     }
+    req.flash('success', 'Đã xóa bài của bạn thành công!!!');
     res.redirect('/posts');
 }
 
@@ -109,10 +180,3 @@ module.exports.deleteTinyMCE = async (req,res) => {
     console.log(filename);
     await cloudinary.uploader.destroy(filename);
 }
-// module.exports.addLike = async (req,res) => {
-//     const id = req.params.id;
-//     const post = await Post.findById(id);
-//     post.like += 1;
-//     await post.save();
-//     res.redirect('/user/post');
-// }

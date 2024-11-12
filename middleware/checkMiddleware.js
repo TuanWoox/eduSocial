@@ -1,5 +1,7 @@
 const Question = require('../models/question');
 const QuestionComment = require('../models/questioncomment');
+const Post = require('../models/Post');
+const PostComment = require('../models/postcomment');
 module.exports.isLoggedIn = (req,res,next) => {
     //isAuthenticated() is used to check if the cookie for the session is still valid!
     if(!req.isAuthenticated())
@@ -32,6 +34,24 @@ module.exports.isAuthorOfQuestionComment = async (req,res,next) => {
     {
         req.flash('error', 'Bạn không có quyền để làm như thế!!!');
         return res.redirect(`/questions/${req.params.id}`);
+    }
+    next();
+}
+module.exports.isAuthorOfPost = async (req,res,next) => {
+    const post = await Post.findById(req.params.id);
+    if(!post.author.equals(req.user._id))
+    {
+        req.flash('error', 'Bạn không có quyền để làm như thế!!!');
+        return res.redirect(`/posts/${req.params.id}`);
+    }
+    next();
+}
+module.exports.isAuthorOfPostComment = async (req,res,next) => {
+    const postComment = await PostComment.findById(req.params.commentID);
+    if(!postComment.author.equals(req.user._id))
+    {
+        req.flash('error', 'Bạn không có quyền để làm như thế!!!');
+        return res.redirect(`/posts/${req.params.id}`);
     }
     next();
 }

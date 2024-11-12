@@ -6,32 +6,34 @@ const { storage } = require('../cloudinary/postCloud');
 const upload = multer({storage});
 const postController = require('../controllers/post');
 const postCommentController = require('../controllers/postComment');
+const {isLoggedIn,isAuthorOfPost,isAuthorOfPostComment} = require('../middleware/checkMiddleware');
+const {validatePost} = require('../middleware/validateMiddleware')
   
 router.get('/', CatchAsync(postController.viewPost));
 
 router.route('/create')
-.get(postController.viewCreate)
-.post(CatchAsync(postController.createPost));
+.get(isLoggedIn,postController.viewCreate)
+.post(isLoggedIn,validatePost,CatchAsync(postController.createPost));
 
 router.route('/:id/sendAnswers')
-.post(CatchAsync(postCommentController.sendAnswer))
+.post(isLoggedIn,CatchAsync(postCommentController.sendAnswer))
 
 router.route('/:id/editAnswer/:commentID')
-.get(CatchAsync(postCommentController.formEditAnswer))
+.get(isLoggedIn,isAuthorOfPostComment,CatchAsync(postCommentController.formEditAnswer))
 
 router.route('/:id/:commentID') 
-.put(CatchAsync(postCommentController.editAnswer))
-.delete(CatchAsync(postCommentController.deleteAnswer))
+.put(isLoggedIn,isAuthorOfPostComment,CatchAsync(postCommentController.editAnswer))
+.delete(isLoggedIn,isAuthorOfPostComment,CatchAsync(postCommentController.deleteAnswer))
 
 // Route để view form edit bài viết
 router.route('/:id/edit')
-.get(CatchAsync(postController.viewEdit));
+.get(isLoggedIn,isAuthorOfPost,CatchAsync(postController.viewEdit));
 
 // Route để lấy bài viết cụ thể và cập nhật
 router.route('/:id')
 .get(CatchAsync(postController.viewAPost))
-.delete(CatchAsync(postController.deletePost))
-.put(CatchAsync(postController.editPost));
+.delete(isLoggedIn,isAuthorOfPost,CatchAsync(postController.deletePost))
+.put(isLoggedIn,isAuthorOfPost,validatePost,CatchAsync(postController.editPost));
 
 // router.get('/:id/like',CatchAsync(postController.addLike))
 

@@ -1,4 +1,4 @@
-const { questionSchema,questionCommentSchema } = require('../joiValidate/validateSchema');
+const { questionSchema,questionCommentSchema,postSchema } = require('../joiValidate/validateSchema');
 const ExpressError = require('../utils/ExpressError');
 module.exports.validateQuestion = async (req, res, next) => {
     const { title, body } = req.body.question;
@@ -33,3 +33,20 @@ module.exports.validateQuestionComment = async (req, res, next) => {
         next();
     }
 };
+module.exports.validatePost = async (req,res,next) => {
+    const {title,content} = req.body.post;
+    const tagsArray = req.body.post.tags.split(' ').filter(tag => tag.trim() !== ''); // Split and filter tags
+    const {error} = postSchema.validate( {
+        post: {
+            title,
+            content
+        },
+        tags: tagsArray
+    })
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}

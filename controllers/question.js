@@ -7,7 +7,7 @@ const topic = {
 }
 module.exports.index = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const questionsPerPage = 1;
+    const questionsPerPage = 15;
 
     // Default sorting by newest
     let sortBy = { createdAt: -1 };  // Sorting by newest by default
@@ -67,7 +67,7 @@ module.exports.viewEditQuestion = async (req,res) => {
 
 module.exports.viewQuestion = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Default to page 1
-    const commentsPerPage = 5;
+    const commentsPerPage = 10;
 
     const question = await Question.findById(req.params.id)
     .populate({
