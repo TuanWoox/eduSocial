@@ -19,7 +19,7 @@ module.exports.createLocalUser = async (req,res,next) => {
             return res.redirect('/courses');
         })
     } catch (e) {
-        return res.redirect('/users/register');
+        return res.redirect('/register');
     }
 }
 module.exports.loginUser = (req, res) => {

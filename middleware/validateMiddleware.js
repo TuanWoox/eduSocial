@@ -1,4 +1,4 @@
-const { questionSchema,questionCommentSchema,postSchema } = require('../joiValidate/validateSchema');
+const { questionSchema,questionCommentSchema,postSchema,courseSchema, lessonSchema } = require('../joiValidate/validateSchema');
 const ExpressError = require('../utils/ExpressError');
 module.exports.validateQuestion = async (req, res, next) => {
     const { title, body } = req.body.question;
@@ -42,6 +42,38 @@ module.exports.validatePost = async (req,res,next) => {
             content
         },
         tags: tagsArray
+    })
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+module.exports.validateCourse = async (req,res,next) => {
+    console.log(req.body)
+    const {title,description,topic} = req.body.course;
+    const { error } = courseSchema.validate( {
+        course: {
+            title,
+            description,
+            topic,
+        }
+    })
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+module.exports.validateLesson = async (req,res,next) => {
+    const {content,title} = req.body.course;
+    const {error } = lessonSchema.validate( {
+        lesson: {
+            title,
+            content
+        }
     })
     if (error) {
         const msg = error.details.map(el => el.message).join(',');

@@ -21,10 +21,6 @@ const LessonSchema = new Schema({
         url: { type: String},
         filename: { type: String }
     }],
-    // comments: [{
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'PostComment'  
-    // }],
     lessOfCourse: {
         type: Schema.Types.ObjectId,
         ref: 'Course'

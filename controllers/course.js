@@ -1,5 +1,6 @@
 const Course = require('../models/course')
 const Lesson = require('../models/lessson');
+const User = require('../models/User');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Tất cả khóa học',
@@ -7,26 +8,74 @@ const topic = {
     find: 'câu khóa học'
 
 }
-module.exports.index = async (req,res) => {
-    const courses = await Course.find({});
-    res.render('courses/index',{topic,courses})
-}
+
+module.exports.index = async (req, res) => {
+    const perPage = 10; // Number of courses per page
+    const page = req.query.page || 1; // Default to page 1 if no page query parameter
+    const topic = req.query.topic || 'Lập trình'; // Default topic: 'IT & Phần mềm'
+    const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
+
+    // Build filter and sort options
+    let query = { };
+    if (topic) {
+        query.topic = topic; // Filter by selected topic
+    }
+    
+    // Determine the sorting criteria
+    let sortOptions = {};
+    if (sortBy === 'createdAt') {
+        sortOptions = { createdAt: -1 }; // Sort by creation date, newest first
+    } else if (sortBy === 'activity') {
+        sortOptions = { updatedAt: -1 }; // Sort by last updated date
+    } else if(sortBy === 'student') {
+        sortOptions = { studentCount : -1}
+    }
+
+    // Get courses with the filtering and sorting applied
+    const courses = await Course.find({topic: topic})
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .sort(sortOptions);
+    // Get total number of courses for pagination
+    const count = await Course.countDocuments(query);
+
+    console.log(sortBy);
+    // Render the page with courses, topic, and pagination info
+    res.render('courses/index', {
+        topic,
+        sortBy,
+        courses,
+        currentPage: page,
+        totalPages: Math.ceil(count / perPage),
+    });
+};
+
+
+
 module.exports.createForm = async (req,res) => {
     res.render('courses/createCourse', {topic});
 }
 module.exports.createCourse = async (req,res) => {
-    const tagsArray = req.body.course.tags.split(' ').filter(tag => tag.trim() !== '');
     const newCourse = new Course({
         ...req.body.course,
-        tags: tagsArray
+        author: req.user._id
     });
-    newCourse.coursethumbnail = {url: req.file.path, filename: req.file.filename}
+    if (req.file) {
+        newCourse.coursethumbnail = {
+            url: req.file.path,
+            filename: req.file.filename
+        };
+    } 
     await newCourse.save();
+    const user = await User.findById(req.user._id);
+    user.own_courses.push(newCourse._id);
+    await user.save();
     res.redirect(`/courses/${newCourse.id}`);
 }
 module.exports.viewACourse = async (req,res) => {
     const viewedCourse = await Course.findById(req.params.id)
-    .populate('lessons', 'title _id');
+    .populate('lessons', 'title _id')
+    .populate('author', 'name _id own_courses')
     res.render('courses/showCourse', {topic, viewedCourse});
 }
 module.exports.viewEditCourseInfoForm = async (req,res) => {
@@ -40,11 +89,11 @@ module.exports.viewEditCourseInfoForm = async (req,res) => {
 }
 module.exports.editCourseInfomation = async (req,res) => {
     const id = req.params.id;
-    const tagsArray = req.body.course.tags.split(' ').filter(tag => tag.trim() !== '');
+    console.log(req.body);
     const newData = {
         title: req.body.course.title,
         description: req.body.course.description,
-        tags: tagsArray
+        topic: req.body.course.topic
     }
     const course = await Course.findByIdAndUpdate(id,newData,{ new: true, runValidators: true })
     if(req.file)
@@ -67,103 +116,19 @@ module.exports.deleteCourse = async (req,res) => {
             await cloudinary.uploader.destroy(image.filename);
         }
     }
+     // Find users who have the deleted course in their coursesProgress array
+     const users = await User.find({
+        'coursesProgress.courseId': id // Match the courseId in coursesProgress array
+    });
+
+    // Loop through all users and remove the deleted course from their coursesProgress array
+    for (let user of users) {
+        // Filter out the course from the coursesProgress array
+        user.coursesProgress = user.coursesProgress.filter(progress => progress.courseId.toString() !== id.toString());
+        
+        // Save the updated user document
+        await user.save();
+    }
     res.redirect('/courses');
-}
-
-module.exports.createLessonForm = (req,res) => {
-    const courseID = req.params.id;
-    res.render('courses/createLesson', {topic, courseID});
-}
-module.exports.createLesson = async (req,res) => {
-    const courseID = req.params.id;
-    const course = await Course.findById(courseID);
-    const {title,content,images} = req.body.course;
-    const imagesParsed = JSON.parse(images);
-    const newLesson = new Lesson({
-        title,
-        content,
-        images: imagesParsed,
-        lessOfCourse: courseID
-    })
-    await newLesson.save();
-    course.lessons.push(newLesson._id);
-    await course.save();
-    return res.redirect(`/courses/${courseID}`);
-}
-module.exports.viewALesson = async (req, res) => {
-    const courseID = req.params.id;
-    const lessonID = req.params.lessonID;
-
-    // Fetch the current lesson
-    const lesson = await Lesson.findById(lessonID);
-
-    // Ensure the 'lesson' exists
-    if (!lesson) {
-        return res.status(404).send("Lesson not found");
-    }
-
-    // Fetch the previous lesson based on 'createdAt' timestamp, only fetching the _id
-    const previousLesson = await Lesson.findOne({
-        lessOfCourse: courseID,
-        createdAt: { $lt: lesson.createdAt }  // Lessons created before the current lesson
-    }).select('_id');  // Only select the _id field
-
-    // Fetch the next lesson based on 'createdAt' timestamp, only fetching the _id
-    const nextLesson = await Lesson.findOne({
-        lessOfCourse: courseID,
-        createdAt: { $gt: lesson.createdAt }  // Lessons created after the current lesson
-    }).select('_id');  // Only select the _id field
-
-    // Extract just the _id if previousLesson and nextLesson are found
-    const previousLessonId = previousLesson ? previousLesson._id : null;
-    const nextLessonId = nextLesson ? nextLesson._id : null;
-
-    res.render('courses/viewLesson', { courseID, lesson, previousLessonId, nextLessonId, topic });
-};
-
-module.exports.editLessonForm = async (req,res) => {
-    const courseID = req.params.id;
-    const lessonID = req.params.lessonID;
-    const lesson = await Lesson.findById(lessonID);
-    res.render('courses/editLesson', {topic, courseID, lesson});
-}
-
-module.exports.updateLesson = async (req,res) => {
-    const id = req.params.id;
-    const lessonID = req.params.lessonID;
-    const newData = {
-        title: req.body.course.title,
-        content: req.body.course.content,
-    }
-    const lesson = await Lesson.findByIdAndUpdate(lessonID, newData, { new: true, runValidators: true });
-    const imgs = JSON.parse(req.body.newImages);
-    lesson.images.push(...imgs);
-    await lesson.save();
-    const deletedImages = JSON.parse(req.body.deletedImages);
-    if(deletedImages)
-        {
-            for(let filename of deletedImages )
-            {
-                await cloudinary.uploader.destroy(filename);
-            }
-            await Lesson.updateOne({$pull: {images: {filename: {$in: deletedImages}}}});
-    }
-    res.redirect(`/courses/${id}/${lessonID}`);
-}
-
-module.exports.deleteLesson = async (req,res) => {
-    const courseID = req.params.id;
-    const lessonID = req.params.lessonID;
-    const deleteLesson = await Lesson.findByIdAndDelete(lessonID);
-    for(const image of deleteLesson.images) {
-        await cloudinary.uploader.destroy(image.filename);
-    }
-
-    await Course.findByIdAndUpdate(courseID, {
-        $pull: {
-            lessons: lessonID
-        }
-    })
-    res.redirect(`/courses/${courseID}`);
 }
 

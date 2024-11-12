@@ -1,10 +1,10 @@
 <% layout('layouts/indexboilerplate') -%>
 <div class="container mt-4">
-  <h2>Create a New Course</h2>
-  <form action="/courses/create" method="POST" enctype="multipart/form-data">
+  <h2>Tạo 1 khóa học mới dành cho mọi người</h2>
+  <form action="/courses/create" method="POST" enctype="multipart/form-data" novalidate class="validated-form">
     <!-- Title Field -->
     <div class="mb-3">
-      <label for="title" class="form-label">Course Title</label>
+      <label for="title" class="form-label">Tiêu đề của khóa học</label>
       <input type="text" id="title" name="course[title]" class="form-control" required>
     </div>
 
@@ -14,19 +14,22 @@
       <textarea id="description" name="course[description]" class="form-control" rows="4" required></textarea>
     </div>
 
+    <!-- Course Type Field -->
+    <div class="mb-3">
+      <label for="type" class="form-label">Chủ đề của khóa học</label>
+      <select id="type" name="course[topic]" class="form-control" required>
+        <option value="Lập trình">Lập trình</option>
+        <option value="IT & Phần mềm">IT & Phần mềm</option>
+        <option value="Ngoại ngữ">Ngoại ngữ</option>
+      </select>
+    </div>
+
     <!-- Thumbnail Field -->
     <div class="mb-3">
-      <label for="coursethumbnail" class="form-label">Course Thumbnail</label>
-      <input type="file" id="coursethumbnail" name="coursethumbnail" class="form-control" accept="image/*">
+      <label for="coursethumbnail" class="form-label">Hình ảnh của khóa học</label>
+      <input type="file" id="coursethumbnail" name="coursethumbnail" class="form-control" accept="image/*" required>
     </div>
-
-    <!-- Tags Field -->
-    <div class="mb-3">
-        <label for="tags" class="form-label">Tags (seperated by space)</label>
-        <input type="text" class="form-control" id="tags" name="course[tags]">
-    </div>
-
     <!-- Submit Button -->
-    <button type="submit" class="btn btn-primary">Create Course</button>
+    <button type="submit" class="btn btn-primary">Tạo khóa học</button>
   </form>
 </div>

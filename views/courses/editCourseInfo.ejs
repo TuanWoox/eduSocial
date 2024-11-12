@@ -1,22 +1,32 @@
 <% layout('layouts/indexboilerplate') -%>
 <div class="container mt-4">
   <h2>Edit your course information</h2>
-  <form action="/courses/<%= course.id  %>/edit" method="POST" enctype="multipart/form-data">
+  <form action="/courses/<%=course.id %>/edit" method="POST" enctype="multipart/form-data">
     <!-- Title Field -->
     <div class="mb-3">
-      <label for="title" class="form-label">Course Title</label>
+      <label for="title" class="form-label">Chỉnh sửa thông tin của khóa học</label>
       <input type="text" id="title" name="course[title]" class="form-control" required value="<%= course.title  %>">
     </div>
 
     <!-- Description Field -->
     <div class="mb-3">
-      <label for="description" class="form-label">Course Description</label>
+      <label for="description" class="form-label">Tiêu đề khóa học</label>
       <textarea id="description" name="course[description]" class="form-control" rows="4" required> <%= course.description  %></textarea>
+    </div>
+
+    <!-- Topic Field -->
+    <div class="mb-3">
+      <label for="type" class="form-label">Chủ đề của khóa học</label>
+      <select id="type" name="course[topic]" class="form-control" required>
+        <option value="Lập trình" <%= course.topic === 'Lập trình' ? 'selected' : '' %>>Lập trình</option>
+        <option value="IT & Phần mềm" <%= course.topic === 'IT & Phần mềm' ? 'selected' : '' %>>IT & Phần mềm</option>
+        <option value="Ngoại ngữ" <%= course.topic === 'Ngoại ngữ' ? 'selected' : '' %>>Ngoại ngữ</option>
+      </select>
     </div>
 
     <!-- Thumbnail Field with Current Thumbnail Preview -->
     <div class="mb-3">
-    <label for="coursethumbnail" class="form-label">Course Thumbnail</label>
+    <label for="coursethumbnail" class="form-label">Ảnh của khóa học</label>
     
     <!-- Current Thumbnail Preview -->
     <% if (course.coursethumbnail) { %>
@@ -28,18 +38,8 @@
     <input type="file" id="coursethumbnail" name="coursethumbnail" class="form-control" accept="image/*">
     </div>
 
-    <!-- Tags Field -->
-    <div class="mb-3">
-    <label for="tags" class="form-label">Tags (separated by space)</label>
-    <input
-      type="text"
-      class="form-control"
-      id="tags"
-      name="course[tags]"
-      value="<%= course.tags ? course.tags.join(' ') : '' %>"
-    >
-  </div>
-    <div class="d-flex justify-content-between">
+    
+    <div class="d-flex justify-content-between mb-2">
       <!-- Submit Button -->
       <button type="submit" class="btn btn-outline-primary w-45">Edit Course</button>
       <!-- Cancle Button -->

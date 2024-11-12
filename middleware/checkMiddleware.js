@@ -2,6 +2,7 @@ const Question = require('../models/question');
 const QuestionComment = require('../models/questioncomment');
 const Post = require('../models/Post');
 const PostComment = require('../models/postcomment');
+const Course = require('../models/course');
 module.exports.isLoggedIn = (req,res,next) => {
     //isAuthenticated() is used to check if the cookie for the session is still valid!
     if(!req.isAuthenticated())
@@ -52,6 +53,15 @@ module.exports.isAuthorOfPostComment = async (req,res,next) => {
     {
         req.flash('error', 'Bạn không có quyền để làm như thế!!!');
         return res.redirect(`/posts/${req.params.id}`);
+    }
+    next();
+}
+module.exports.isAuthorOfCourse = async (req,res,next) => {
+    const course = await Course.findById(req.params.id);
+    if(!course.author.equals(req.user._id))
+    {
+        req.flash('error', 'Bạn không có quyền để làm như thế!!!');
+        return res.redirect(`/courses/${req.params.id}`);
     }
     next();
 }

@@ -10,11 +10,11 @@ const courseSchema = new Schema(
     description: {
       type: String
     },
-    // instructorId: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: 'User'
-    // },
+    author: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User'
+    },
     coursethumbnail: {
       url: {
         type: String
@@ -29,9 +29,6 @@ const courseSchema = new Schema(
           ref: 'Lesson',
         }      
     ],
-    tags: [{
-      type: String
-    }],
     studentsEnrolled: [{
       type: Schema.Types.ObjectId,
       ref: 'User'
@@ -39,6 +36,10 @@ const courseSchema = new Schema(
     studentCount: {
       type: Number,
       default: 0
+    },
+    topic: {
+      type: String,
+      required: true,
     }
   },
   { timestamps: true }

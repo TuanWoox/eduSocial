@@ -1,15 +1,84 @@
 <% layout('layouts/indexboilerplate') -%>
-<div class="row mt-4 p-4 m-auto justify-content-center">
+<div class="row mt-4 p-4  justify-content-center">
+    <!-- Search and Filters -->
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic.find %>" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <input type="text" class="form-control" placeholder="Tìm kiếm <%= topic %>" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
         <div class="input-group-append">
-          <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
+            <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
         </div>
-      </div>
+    </div>
+    
+    <!-- Navbar for Sorting and Topic Filter -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-3 rounded mb-4">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <button class="btn btn-outline-primary active me-2">Bài Viết</button>
+            </li>
+        </ul>
+        <div>
+            <!-- Topic Dropdown -->
+            <!-- Topic Dropdown -->
+<div class="d-flex align-items-center me-5">
+    <p class="mb-0 me-2">Chủ đề:</p>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <%= topic %>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="?topic=<%= encodeURIComponent('Lập trình') %>&sortBy=<%= sortBy %>&page=1" class="dropdown-item <%= topic === 'Lập trình' ? 'active' : '' %>">
+                    Lập trình
+                </a>
+            </li>
+            <li>
+                <a href="?topic=<%= encodeURIComponent('Ngoại ngữ') %>&sortBy=<%= sortBy %>&page=1" class="dropdown-item <%= topic === 'Ngoại ngữ' ? 'active' : '' %>">
+                    Ngoại ngữ
+                </a>
+            </li>
+            <li>
+                <a href="?topic=<%= encodeURIComponent('IT & Phần mềm') %>&sortBy=<%= sortBy %>&page=1" class="dropdown-item <%= topic === 'IT & Phần mềm' ? 'active' : '' %>">
+                    IT & Phần mềm
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Sort By Dropdown -->
+    <div class="dropdown ms-2">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <% if(sortBy === 'createdAt') { %>
+                Tạo mới nhất
+            <% }  %>
+            <% if(sortBy === 'activity') { %>
+                Hoạt động
+            <% }  %>
+            <% if(sortBy === 'students') { %>
+                Học sinh tham gia
+            <% }  %>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="?topic=<%= encodeURIComponent(topic) %>&sortBy=createdAt&page=1" class="dropdown-item <%= sortBy === 'createdAt' ? 'active' : '' %>">
+                    Tạo mới nhất
+                </a>
+            </li>
+            <li>
+                <a href="?topic=<%= encodeURIComponent(topic) %>&sortBy=activity&page=1" class="dropdown-item <%= sortBy === 'activity' ? 'active' : '' %>">
+                    Hoạt động
+                </a>
+            </li>
+            <li>
+                <a href="?topic=<%= encodeURIComponent(topic) %>&sortBy=students&page=1" class="dropdown-item <%= sortBy === 'students' ? 'active' : '' %>">
+                    Học sinh tham gia
+                </a>
+            </li>
+        </ul>
+    </div>
+
+        </div>
+    </nav>
 </div>
-<div class="row mb-3">
-    <a href="/courses/create" class="btn btn-primary ms-4" style="width: 15%;">Tạo khóa học của bạn!</a>
-</div>
+
 <% if (courses && courses.length > 0) { %>
   <% for (let course of courses) { %>
     <div class="card mx-2 my-2 course" style="width: 234px; height: 400px;">
@@ -33,3 +102,33 @@
 <% } else { %>
     <h2 class="ms-5">Hiện chưa có khóa học nào!</h2>
 <% } %>
+
+<div class="row mt-4 p-4 m-auto justify-content-center">
+    <!-- Pagination Controls -->
+    <% if (totalPages > 1) { %>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                    </li>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    <% } %>
+</div>
+<div class="row mb-3 ">
+    <a href="/courses/create" class="btn btn-info ms-4" style="width: 12%;">Tạo khóa học!</a>
+</div>

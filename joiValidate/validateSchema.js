@@ -46,3 +46,18 @@ module.exports.postSchema = Joi.object({
     }).required(),
     tags: Joi.array().items(Joi.string()).required()
 });
+
+module.exports.courseSchema = Joi.object({
+    course: Joi.object({
+        title: Joi.string().required(),
+        topic: Joi.string().valid('Coding', 'IT & Software', 'English').required(), // Restrict topic to 3 values
+        description: Joi.string().required(),
+    }).required()
+});
+
+module.exports.lessonSchema = Joi.object({
+    lesson: Joi.object({
+        title: Joi.string().required(),
+        content: Joi.string().escapeXSS().required()
+    }).required(),
+})

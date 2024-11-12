@@ -49,10 +49,11 @@ const userSchema = new Schema({
       type: Schema.Types.ObjectId, 
       ref: 'Course' 
     },
-    currentLesson: 
-    { 
-      type: Number 
-    }, 
+    // currentLesson: 
+    // { 
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'Lesson'
+    // }, 
     lastAccessed: 
     { 
       type: Date, default: Date.now 
@@ -66,11 +67,11 @@ const userSchema = new Schema({
     ref: 'Question'
     }
   ],
-  own_series : 
+  own_courses : 
   [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Series'
+      ref: 'Course'
     }
   ]
 },
