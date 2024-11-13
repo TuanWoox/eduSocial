@@ -1,5 +1,4 @@
-const Post = require('../models/Post');
-const postComment = require('../models/postcomment');
+const Comment = require('../models/comment');
 
 const topic = {
     title: 'Bài viết',
@@ -9,45 +8,55 @@ const topic = {
 module.exports.sendAnswer = async (req, res) => {
     const id = req.params.id;
     const { body, replyTo } = req.body.answer;
-    // Initialize the object for creating the new comment
     const newPostCommentData = {
         commentedOnPost: id,
         author: req.user._id,
-        body // Always include the body
+        body
     };
-    // If replyTo is not an empty string, add it to the new comment data
     if (replyTo && replyTo !== '') {
-        newPostCommentData.replyTo = replyTo; // Add replyTo only if it's not empty
+        newPostCommentData.replyTo = replyTo; 
     }
-    const newPostComment = new postComment(newPostCommentData);
-    //Find the post to insert the comment in
-    const post = await Post.findById(id);
-    //Push the comments
-    post.comments.push(newPostComment._id); 
+    const newPostComment = new Comment(newPostCommentData);
     await newPostComment.save();
-    await post.save();
     req.flash('success', 'Bình luận thành công');
     res.redirect(`/posts/${id}`);
 };
 module.exports.formEditAnswer = async (req,res) => {
-    const id = req.params.commentID;
-    const comment = await postComment.findById(id); // Pass id directly
+    const postID = req.params.id;
+    const commentID = req.params.commentID;
+    const query = {
+        commentedOnPost: postID,
+        _id: commentID,
+    };
+    const comment = await Comment.findOne(query);
     res.render('posts/editPostComment', {topic,comment});
 }
 module.exports.editAnswer = async (req, res) => {
-    const  id = req.params.commentID; 
-    const updatedData = req.body; 
-    const answer = await postComment.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
+    const postID = req.params.id;
+    const commentID = req.params.commentID;
+    const query = {
+        commentedOnPost: postID,
+        _id: commentID,
+    };
+    const updatedData = {
+        body: req.body.answer.body,
+    };
+    if (req.body.answer.replyTo && req.body.answer.replyTo !== '') {
+        updatedData.replyTo = req.body.answer.replyTo;
+    }
+    const answer = await Comment.findOneAndUpdate(query, updatedData, { new: true, runValidators: true });
     res.redirect(`/posts/${answer.commentedOnPost}`);
 };
 module.exports.deleteAnswer = async (req,res) => {
-    const answerid = req.params.commentID;
-    const postsid = req.params.id;
-    await Post.findByIdAndUpdate( 
-        postsid,
-        { $pull: { comments:answerid } }, // Remove the comment with the specific ID
-        { new: true } // Return the updated document
-    )
-    await postComment.findByIdAndDelete(answerid);
-    res.redirect(`/posts/${postsid}`);
+    const postID = req.params.id;
+    const commentID = req.params.commentID;
+    const deleteReplies = async (commentId) => {
+        const replies = await Comment.find({ replyTo: commentId });
+        for (let reply of replies) {
+            await deleteReplies(reply._id);  
+        }
+        await Comment.findByIdAndDelete(commentId);
+    };
+    await deleteReplies(commentID);
+    res.redirect(`/posts/${postID}`);
 }

@@ -1,5 +1,5 @@
 const Post = require('../models/Post'); 
-const PostComment = require('../models/postcomment');
+const Comment = require('../models/comment');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Bài viết',
@@ -84,35 +84,35 @@ module.exports.viewAPost = async (req, res) => {
         path: 'author',
         select: 'name _id',
     })
+    const query = {
+        commentedOnPost: post._id
+    }
+    const comments = await Comment.find(query)
+    .limit(commentsPerPage)
+    .skip((page - 1) * commentsPerPage)
     .populate({
-        path: 'comments',
-        options: {
-            limit: commentsPerPage,
-            skip: (page - 1) * commentsPerPage,
+        path: 'author',
+        select: 'name _id',
+    })
+    .populate({
+        path: 'replyTo',
+        populate: {
+            path: 'author',
+            select: 'name _id',
         },
-        populate: [
-            {
-                path: 'author',
-                select: 'name _id',
-            },
-            {
-                path: 'replyTo',
-                populate: {
-                    path: 'author',
-                    select: 'name _id',
-                },
-                select: '_id body',
-            }
-        ]
+        select: '_id body',
     });
-    post.views += 1; // Tăng lượt xem mỗi khi người dùng truy cập
-    await post.save();
-    const totalComments = await PostComment.countDocuments({commentedOnPost: post._id});
+
+    const totalComments = await Comment.countDocuments(query);
     const totalPages = Math.ceil(totalComments/commentsPerPage);
+
+    post.views += 1; 
+    await post.save();
 
     res.render('posts/show', {
         topic,
         post, 
+        comments,
         currentPage: page,
         totalPages,
         totalComments

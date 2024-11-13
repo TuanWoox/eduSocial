@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const PostSchema = new Schema({
+const Comment = require('./comment');
+const postSchema = new Schema({
     name:{
         type: String,
         required: false,
@@ -46,5 +47,13 @@ const PostSchema = new Schema({
         required: true
     }
 }, {timestamps: true});
-const Post = mongoose.model('Post',PostSchema);
-module.exports = Post;
+
+postSchema.post('findOneAndDelete', async function(post) {
+    if(post){
+        await Comment.deleteMany({
+          commentedOnPost: post._id
+        })
+    }
+})
+
+module.exports =  mongoose.model('Post',postSchema);

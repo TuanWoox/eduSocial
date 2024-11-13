@@ -1,5 +1,5 @@
-const Question = require('../models/question')
-const QuestionComment = require('../models/questioncomment');
+const Question = require('../models/question');
+const Comment = require('../models/comment');
 const topic = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -68,43 +68,42 @@ module.exports.viewEditQuestion = async (req,res) => {
 module.exports.viewQuestion = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Default to page 1
     const commentsPerPage = 10;
+   
 
     const question = await Question.findById(req.params.id)
     .populate({
         path: 'author',
         select: 'name _id',
+    });
+    const query = {
+        commentedOnQuestion: question._id
+    }
+
+    const comments = await Comment.find(query)
+    .limit(commentsPerPage)
+    .skip((page - 1) * commentsPerPage)
+    .populate({
+        path: 'author',
+        select: 'name _id',
     })
     .populate({
-        path: 'comments',
-        options: {
-            limit: commentsPerPage,
-            skip: (page - 1) * commentsPerPage,
+        path: 'replyTo',
+        populate: {
+            path: 'author',
+            select: 'name _id',
         },
-        populate: [
-            {
-                path: 'author',
-                select: 'name _id',
-            },
-            {
-                path: 'replyTo',
-                populate: {
-                    path: 'author',
-                    select: 'name _id',
-                },
-                select: '_id body',
-            }
-        ]
+        select: '_id body',
     });
 
+    const totalComments = await Comment.countDocuments(query);
+    const totalPages = Math.ceil(totalComments / commentsPerPage);
     question.views += 1;
     await question.save();
-
-    const totalComments = await QuestionComment.countDocuments({commentedOnQuestion: question._id});
-    const totalPages = Math.ceil(totalComments / commentsPerPage);
 
     res.render('questions/show', {
         topic,
         question,
+        comments,
         currentPage: page,
         totalPages,
         totalComments
@@ -125,7 +124,7 @@ module.exports.editQuestion = async (req, res) => {
 };
 
 module.exports.deleteQuestion = async (req,res) => {
-    await Question.findByIdAndDelete({_id : req.params.id})
+    await Question.findByIdAndDelete(req.params.id)
     req.flash('success', 'Xóa câu hỏi thành công!!!');
     res.redirect('/questions');
 }

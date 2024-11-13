@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Comment = require('./comment');
 const questionSchema = new Schema({
     title: {
       type: String,
@@ -17,11 +18,6 @@ const questionSchema = new Schema({
     tags: [{
       type: String
     }],
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'QuestionComment'
-    }]
-    ,
     upvotes: {
       type: Number,
       default: 0
@@ -41,5 +37,13 @@ const questionSchema = new Schema({
 },
     {timestamps: true}
 );
+
+questionSchema.post('findOneAndDelete', async function(question) {
+  if(question){
+      await Comment.deleteMany({
+        commentedOnQuestion: question._id
+      })
+  }
+})
   
 module.exports = mongoose.model('Question', questionSchema)

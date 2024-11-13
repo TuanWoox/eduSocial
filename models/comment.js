@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const questionCommentSchema = new Schema({
+
+const commentSchema = new Schema({
     body : {
         type: String,
         required: true
@@ -18,17 +19,17 @@ const questionCommentSchema = new Schema({
         type: Number,
         default: 0,
     },
-    // upvotedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    // downvotedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     replyTo: {
         type: Schema.Types.ObjectId,
-        ref: 'QuestionComment'
+        ref: 'Comment'
+    },
+    commentedOnPost: {
+        type: Schema.Types.ObjectId,
+        ref: 'Post',
     },
     commentedOnQuestion: {
         type: Schema.Types.ObjectId,
         ref: 'Question',
-        required: true,
     }
 }, { timestamps: true });
-
-module.exports = mongoose.model('QuestionComment', questionCommentSchema);
+module.exports = mongoose.model('Comment', commentSchema);

@@ -67,9 +67,6 @@ module.exports.createCourse = async (req,res) => {
         };
     } 
     await newCourse.save();
-    const user = await User.findById(req.user._id);
-    user.own_courses.push(newCourse._id);
-    await user.save();
     res.redirect(`/courses/${newCourse.id}`);
 }
 module.exports.viewACourse = async (req,res) => {

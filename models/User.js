@@ -60,20 +60,6 @@ const userSchema = new Schema({
     }
     }
   ],
-  questions : 
-  [
-    {
-    type: Schema.Types.ObjectId,
-    ref: 'Question'
-    }
-  ],
-  own_courses : 
-  [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Course'
-    }
-  ]
 },
   {timestamps: true}
 );

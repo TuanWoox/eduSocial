@@ -30,10 +30,10 @@
     <% } %>
     <!-- Answers Section -->
  
-    <% if (post.comments && post.comments.length > 0) { %>
+    <% if (comments && comments.length > 0) { %>
         <div class="mt-5">
             <h3>Số bình luận (<%= totalComments %>)</h3>
-            <% post.comments.forEach(comment => { %>
+            <% comments.forEach(comment => { %>
                 <div class="card my-3">
                     <div class="card-body d-flex">
                         
