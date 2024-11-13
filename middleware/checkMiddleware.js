@@ -8,7 +8,7 @@ module.exports.isLoggedIn = (req,res,next) => {
         {
             req.session.returnTo = req.originalUrl; 
             req.flash('error','Bạn chưa đăng nhập!!!');
-            return res.redirect('/login');
+            return res.redirect('/account/login');
         }
     next();
 }

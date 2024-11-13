@@ -5,7 +5,7 @@ module.exports = new GitHubStrategy(
   {
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: '/login/githubAuth/callback',
+    callbackURL: '/account/login/githubAuth/callback',
     scope: ['user:email']
   },
   async (accessToken, refreshToken, profile, done) => {

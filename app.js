@@ -98,7 +98,7 @@ passport.use('github',passportGithub)
 
 
 // Route imports
-const userRoutes = require('./routes/user');
+const accountRoutes = require('./routes/account');
 const courseRoutes = require('./routes/course');
 const questionRoutes = require('./routes/question');
 const postRoutes = require('./routes/post');
@@ -114,11 +114,15 @@ app.use((req,res,next) => {
 })
 
 // Routes setup
-app.use('/', userRoutes);
+
+app.use('/account', accountRoutes);
 app.use('/api/imageHandler', imageHandlerRoutes);
 app.use('/courses', courseRoutes);
 app.use('/questions', questionRoutes);
 app.use('/posts', postRoutes);
+app.use('/', (req,res) => {
+  res.render('home');
+})
 
 app.all('*',(req,res,next) => {
   next(new ExpressError('Page Not Found', 404))

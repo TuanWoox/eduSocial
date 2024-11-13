@@ -29,8 +29,8 @@
               <% if(!currentUser){ %>
                 <div class="card mb-3 shadow-sm" style="border-radius: 10px; border: none;">
                   <div class="card-body text-center p-3">
-                    <a href="/register" class="btn btn-danger btn-block my-2 py-2" style="font-size: 1rem; font-weight: bold; border-radius: 8px;">Đăng Kí</a>
-                    <a href="/login" class="btn btn-secondary btn-block my-2 py-2" style="font-size: 1rem; font-weight: bold; border-radius: 8px;">Đăng Nhập</a>
+                    <a href="/account/register" class="btn btn-danger btn-block my-2 py-2" style="font-size: 1rem; font-weight: bold; border-radius: 8px;">Đăng Kí</a>
+                    <a href="/account/login" class="btn btn-secondary btn-block my-2 py-2" style="font-size: 1rem; font-weight: bold; border-radius: 8px;">Đăng Nhập</a>
                 </div>                
                 </div>
               <% } else { %>
@@ -95,7 +95,7 @@
                     <i class="bi bi-person-circle"></i> <%= currentUser.name %>
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="/logout"><i class="bi bi-person-check-fill m-1"></i>Thoát tài khoản</a></li>
+                    <li><a class="dropdown-item" href="/account/logout"><i class="bi bi-person-check-fill m-1"></i>Thoát tài khoản</a></li>
                   </ul>
                 </div>
                 <% } else { %>
@@ -104,8 +104,8 @@
                     <i class="bi bi-person-circle"></i> Tài Khoản
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="/login"><i class="bi bi-person-check-fill m-1"></i>Đăng Nhập</a></li>
-                    <li><a class="dropdown-item" href="/register"><i class="bi bi-person-plus-fill m-1"></i>Đăng Kí</a></li>
+                    <li><a class="dropdown-item" href="/account/login"><i class="bi bi-person-check-fill m-1"></i>Đăng Nhập</a></li>
+                    <li><a class="dropdown-item" href="/account/register"><i class="bi bi-person-plus-fill m-1"></i>Đăng Kí</a></li>
                   </ul>
                 </div>
                 <% } %>

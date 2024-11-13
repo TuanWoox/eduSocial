@@ -5,7 +5,7 @@ module.exports = new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/login/googleAuth/callback',
+    callbackURL: '/account/login/googleAuth/callback',
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
