@@ -12,7 +12,7 @@
       <div class="instructor-box p-3 border rounded shadow-sm bg-light d-flex align-items-center">
         <!-- Instructor Avatar -->
         <div class="avatar mr-3">
-          <img src="/pictures/user.png" alt="Instructor Avatar" class="rounded-circle" 
+          <img src="<%= viewedCourse.author.profilePic.url || '/pictures/user.png' %>" alt="Instructor Avatar" class="rounded-circle" 
                style="width: 80px; height: 80px; object-fit: cover;">
         </div>
     
@@ -21,10 +21,10 @@
           <h5 class="font-weight-bold text-primary">Thông tin giảng viên</h5>
           <p class="text-muted">
             <strong>Tên:</strong> <%= viewedCourse.author.name %><br>
-            <strong>Số khóa học hiện có: </strong><%=  viewedCourse.author.own_courses.length %>
+            <strong>Số khóa học hiện có: </strong><%=  authorNumberOfCourse %>
           </p>
           <div class="text-muted">
-            <a href="" class="btn btn-sm btn-info">Trang cá nhân giảng viên</a>
+            <a href="/users/<%= viewedCourse.author._id  %>" class="btn btn-sm btn-info">Trang cá nhân giảng viên</a>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 <div class="container mt-5">
     <h2>Edit Comment</h2>
-    <form action="/questions/<%= comment.commentedOnQuestion %>/<%= comment._id %>?_method=PUT" method="POST">
+    <form action="/questions/<%= comment.commentedOnQuestion %>/<%= comment._id %>?_method=PUT" method="POST" novalidate class="validated-form">
         <div class="form-group">
             <label for="body">Comment:</label>
             <textarea id="body" name="answer[body]" class="form-control" rows="5"><%= comment.body %></textarea>

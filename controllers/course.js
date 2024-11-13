@@ -14,13 +14,11 @@ module.exports.index = async (req, res) => {
     const page = req.query.page || 1; // Default to page 1 if no page query parameter
     const topic = req.query.topic || 'Lập trình'; // Default topic: 'IT & Phần mềm'
     const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
-
     // Build filter and sort options
     let query = { };
     if (topic) {
         query.topic = topic; // Filter by selected topic
     }
-    
     // Determine the sorting criteria
     let sortOptions = {};
     if (sortBy === 'createdAt') {
@@ -30,7 +28,6 @@ module.exports.index = async (req, res) => {
     } else if(sortBy === 'student') {
         sortOptions = { studentCount : -1}
     }
-
     // Get courses with the filtering and sorting applied
     const courses = await Course.find({topic: topic})
         .skip((perPage * page) - perPage)
@@ -38,8 +35,6 @@ module.exports.index = async (req, res) => {
         .sort(sortOptions);
     // Get total number of courses for pagination
     const count = await Course.countDocuments(query);
-
-    console.log(sortBy);
     // Render the page with courses, topic, and pagination info
     res.render('courses/index', {
         topic,
@@ -72,8 +67,9 @@ module.exports.createCourse = async (req,res) => {
 module.exports.viewACourse = async (req,res) => {
     const viewedCourse = await Course.findById(req.params.id)
     .populate('lessons', 'title _id')
-    .populate('author', 'name _id own_courses')
-    res.render('courses/showCourse', {topic, viewedCourse});
+    .populate('author', 'name _id own_courses profilePic')
+    const authorNumberOfCourse = await Course.countDocuments({author: viewedCourse.author})
+    res.render('courses/showCourse', {topic, viewedCourse,authorNumberOfCourse });
 }
 module.exports.viewEditCourseInfoForm = async (req,res) => {
     const id = req.params.id;

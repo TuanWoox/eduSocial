@@ -32,7 +32,7 @@ module.exports.viewPost = async (req, res) => {
     // Fetch post with the selected sort order
     const post = await Post.find().populate({
         path: 'author',
-        select: 'name _id'
+        select: 'name _id profilePic'
     })
     .sort(sortBy)  // Apply the sorting
     .skip((page - 1) * postsPerPage)  // Skip post for previous pages
@@ -92,7 +92,7 @@ module.exports.viewAPost = async (req, res) => {
     .skip((page - 1) * commentsPerPage)
     .populate({
         path: 'author',
-        select: 'name _id',
+        select: 'name _id profilePic',
     })
     .populate({
         path: 'replyTo',

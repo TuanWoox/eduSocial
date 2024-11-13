@@ -1,7 +1,7 @@
 <% layout('layouts/indexboilerplate') -%>
 <div class="container mt-4">
   <h2>Edit your course information</h2>
-  <form action="/courses/<%=course.id %>/edit" method="POST" enctype="multipart/form-data">
+  <form action="/courses/<%=course.id %>/edit" method="POST" enctype="multipart/form-data" novalidate class="validated-form">
     <!-- Title Field -->
     <div class="mb-3">
       <label for="title" class="form-label">Chỉnh sửa thông tin của khóa học</label>

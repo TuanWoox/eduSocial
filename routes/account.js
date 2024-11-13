@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const accountControl = require('../controllers/account');
 const passport = require('passport')
-const {storeReturnTo,isLoggedin} = require('../middleware/checkMiddleware');
+const {storeReturnTo} = require('../middleware/checkMiddleware');
 
 
 

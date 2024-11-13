@@ -4,7 +4,7 @@
     <h1>Tạo bài học mới</h1>
 
     <!-- Form for Creating Post -->
-    <form id="post-create-form" action="/courses/<%=courseID%>/createLesson" method="post" enctype="application/x-www-form-urlencoded">
+    <form id="post-create-form" action="/courses/<%=courseID%>/createLesson" method="post" enctype="application/x-www-form-urlencoded" novalidate class="validated-form">
         <div class="mb-3">
             <label for="title" class="form-label"><h5>Tiêu đề bài học</h5></label>
             <input type="text" id="title" name="course[title]" class="form-control" placeholder="Nhập vào tiêu đề khóa học của bạn" required>

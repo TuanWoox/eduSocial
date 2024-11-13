@@ -1,53 +1,30 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const userControl = require('../controllers/user');
-const passport = require('passport')
-const {storeReturnTo,isLoggedin} = require('../middleware/checkMiddleware');
+const CatchAsync = require('../utils/CatchAsync');
+const multer = require('multer');
+const { storage } = require('../cloudinary/postCloud');
+const upload = multer({storage});
+const {storeReturnTo,isLoggedIn,isYou} = require('../middleware/checkMiddleware');
+const {validateUser} = require('../middleware/validateMiddleware');
 
 
 
-router.route('/register')
-.get(userControl.renderRegisterForm)
-.post(userControl.createLocalUser)
+router.route('/:id/edit')
+.get(isLoggedIn,isYou,CatchAsync(userControl.renderEditForm))
+.post(isLoggedIn,isYou,upload.single('profilePic'),validateUser,CatchAsync(userControl.editUser))
 
-router.route('/login/googleAuth')
-.get(passport.authenticate('google', { scope: ['profile', 'email'] }))
+router.route('/:id/questions')
+.get(CatchAsync(userControl.viewUserQuestions))
 
-router.route('/login/googleAuth/callback')
-.get(
-    storeReturnTo,
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    userControl.loginUser
-);
+router.route('/:id/posts')
+.get(CatchAsync(userControl.viewUserPosts))
 
+router.route('/:id/courses')
+.get(CatchAsync(userControl.viewUserCourses))
 
+router.route('/:id')
+.get(CatchAsync(userControl.viewAUserInfo));
 
-router.route('/login/githubAuth')
-.get(passport.authenticate('github'));
-
-router.route('/login/githubAuth/callback')
-.get(
-  storeReturnTo,
-  passport.authenticate('github', { failureRedirect: '/login' }),
-  userControl.loginUser
-);
-
-router.route('/login')
-.get(userControl.renderLoginForm)
-.post(
-  storeReturnTo,
-  passport.authenticate('local',{failureFlash: true, failureRedirect:'/users/login'}),
-  userControl.loginUser
-)
-
-// Google authentication (GET)
-
-
-
-router.route('/logout')
-.get(userControl.logoutUser)
-
-router.route('/')
-.get(userControl.renderHome)
 
 module.exports = router;

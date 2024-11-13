@@ -1,9 +1,9 @@
 <% layout('layouts/indexboilerplate') -%>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4 px-5">
     <div class="row">
-        <!-- Main Content (Left Side) -->
-        <div class="col-lg-8 main-left">
+        <!-- Main Content (Full Width) -->
+        <div class="col-12">
             <!-- Navbar for Sorting -->
             <nav class="navbar navbar-expand-lg navbar-light bg-light p-3 rounded mb-4">
                 <ul class="navbar-nav me-auto">
@@ -15,16 +15,9 @@
                     <p class="mb-0 me-2">Sắp Xếp:</p>
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <% if(sort === 'newest') { %>
-                                Mới nhất
-                            <% }  %>
-                            <% if(sort === 'activity') { %>
-                                Hoạt động
-                            <% }  %>
-                            <% if(sort === 'views') { %>
-                                Lượt xem
-                            <% }  %>
-                                
+                            <% if(sort === 'newest') { %> Mới nhất <% } %>
+                            <% if(sort === 'activity') { %> Hoạt động <% } %>
+                            <% if(sort === 'views') { %> Lượt xem <% } %>
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="?page=<%= currentPage %>&sort=newest" class="dropdown-item">Mới Nhất</a></li>
@@ -38,16 +31,17 @@
             <!-- Create Post Button -->
             <% if(currentUser) { %>
             <a href="/posts/create" class="btn btn-primary mb-2">Tạo bài viết</a>
-            <% }  %>
+            <% } %>
+
             <!-- Post List -->
             <% if (post && post.length > 0) { %>
                 <div class="post-container d-flex flex-column align-items-start">
                     <% post.forEach(post => { %>
-                        <div class="card mx-3 my-3" style="width: 98%;">
+                        <div class="card mx-3 my-3 shadow-sm container-fluid" style="border: 2px solid black;">
                             <div class="card-body">
                                 <!-- Post User and Content -->
-                                <div class="d-flex align-items-start">
-                                    <div class="user-content me-3">
+                                <div class="d-flex flex-column flex-sm-row align-items-start">
+                                    <div class="user-content me-3 mb-3 mb-sm-0">
                                         <img src="<%= post.author.profilePic.url || '/pictures/user.png' %>" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                                     </div>
                                     <div class="nd">
@@ -56,7 +50,7 @@
                                         </a>
                                         <small class="text-muted"> <strong>Đăng bởi:</strong> <%= post.author.name %> vào <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></small>
                                         <div class="d-flex justify-content-start mt-2">
-                                            <a class="card-link btn btn-success btn-sm me-2" href="/questions/<%= post._id %>">Xem chi tiết</a>
+                                            <a class="card-link btn btn-success btn-sm me-2" href="/posts/<%= post._id %>">Xem chi tiết</a>
                                             <span class="me-3"><i class="bi bi-star-fill text-warning"></i> <%= post.upvotes - post.downvotes %></span>
                                             <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= post.comments.length %></span>
                                             <span><i class="bi bi-eye-fill"></i> <%= post.views %></span>
@@ -70,47 +64,34 @@
             <% } else { %>
                 <h2 class="text-center">Hiện chưa có bài post nào!</h2>
             <% } %>
+
+            <!-- Pagination -->
             <div class="d-flex justify-content-center">
-                <% if (totalPages > 1) { %> <!-- Show pagination only if there are multiple pages -->
+                <% if (totalPages > 1) { %>
                     <nav aria-label="Page navigation">
                         <ul class="pagination">
-                            <!-- Previous button -->
                             <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
                                 <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-            
-                            <!-- First page -->
                             <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
                                 <a class="page-link" href="?page=1&sort=<%= sort %>">1</a>
                             </li>
-            
-                            <!-- Left ellipsis -->
                             <% if (currentPage > 4) { %>
                                 <li class="page-item disabled"><span class="page-link">...</span></li>
                             <% } %>
-            
-                            <!-- Pages around the current page -->
                             <% for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) { %>
                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
                                     <a class="page-link" href="?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
                                 </li>
                             <% } %>
-            
-                            <!-- Right ellipsis -->
                             <% if (currentPage < totalPages - 3) { %>
                                 <li class="page-item disabled"><span class="page-link">...</span></li>
                             <% } %>
-            
-                            <!-- Last page -->
-                            <% if (totalPages > 1) { %>
-                                <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
-                                    <a class="page-link" href="?page=<%= totalPages %>&sort=<%= sort %>"><%= totalPages %></a>
-                                </li>
-                            <% } %>
-            
-                            <!-- Next button -->
+                            <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= totalPages %>&sort=<%= sort %>"><%= totalPages %></a>
+                            </li>
                             <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
                                 <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
@@ -120,25 +101,6 @@
                     </nav>
                 <% } %>
             </div>       
-        </div>
-       
-        <!-- Sidebar (Right Side) -->
-        <div class="col-lg-4 main-right">
-            <!-- Popular Tags Section -->
-            <div class="common-tag bg-light p-4 rounded mb-4 shadow-sm">
-                <h3 class="text-danger mb-3">Tag Phổ biến</h3>
-                <div class="tag-item d-flex justify-content-between align-items-center mb-3">
-                    <p class="mb-0">C#</p>
-                    <p class="mb-0">x138</p>
-                </div>
-                <div class="tag-item d-flex justify-content-between align-items-center mb-3">
-                    <p class="mb-0">JavaScript</p>
-                    <p class="mb-0">x102</p>
-                </div>
-                <div class="morebtn text-end">
-                    <a href="#" class="text-decoration-none text-primary">Xem thêm...</a>
-                </div>
-            </div>
         </div>
     </div>
 </div>

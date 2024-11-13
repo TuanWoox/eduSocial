@@ -95,6 +95,7 @@
                     <i class="bi bi-person-circle"></i> <%= currentUser.name %>
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="/users/<%= currentUser._id %>"><i class="bi bi-info-circle-fill m-1"></i>Trang cá nhân</a></li>
                     <li><a class="dropdown-item" href="/account/logout"><i class="bi bi-person-check-fill m-1"></i>Thoát tài khoản</a></li>
                   </ul>
                 </div>

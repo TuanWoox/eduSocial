@@ -4,7 +4,7 @@
 </div>
 <div class="container mt-2" style="width: 80%;">     
     <h2>Edit Your Post</h2>     
-    <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post">         
+    <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post" novalidate class="validated-form">         
         <div class="mb-3">             
             <label for="title" class="form-label"><h5>Tiêu đề của bài đăng</h5></label>             
             <input type="text" class="form-control" id="title" name="post[title]" required value="<%= post.title %>">                      

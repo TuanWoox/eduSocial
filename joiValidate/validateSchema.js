@@ -61,3 +61,16 @@ module.exports.lessonSchema = Joi.object({
         content: Joi.string().escapeXSS().required()
     }).required(),
 })
+
+module.exports.userSchema = Joi.object({
+    user: Joi.object({
+        name: Joi.string().required(),
+        bio: Joi.string().required(),
+        dateOfBirth: Joi.date().less('now').required(), // Ensures the date is not in the future
+        socialLinks: Joi.object({
+            facebook: Joi.string().uri().regex(/^https:\/\/(www\.)?facebook\.com\//).allow('').optional(),
+            github: Joi.string().uri().regex(/^https:\/\/(www\.)?github\.com\//).allow('').optional(),
+            linkedin: Joi.string().uri().regex(/^https:\/\/(www\.)?linkedin\.com\//).allow('').optional(),
+        }).optional()  // Make the entire socialLinks object optional
+    })
+});

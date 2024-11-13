@@ -99,6 +99,7 @@ passport.use('github',passportGithub)
 
 // Route imports
 const accountRoutes = require('./routes/account');
+const userRoutes = require('./routes/user');
 const courseRoutes = require('./routes/course');
 const questionRoutes = require('./routes/question');
 const postRoutes = require('./routes/post');
@@ -116,6 +117,7 @@ app.use((req,res,next) => {
 // Routes setup
 
 app.use('/account', accountRoutes);
+app.use('/users',userRoutes);
 app.use('/api/imageHandler', imageHandlerRoutes);
 app.use('/courses', courseRoutes);
 app.use('/questions', questionRoutes);

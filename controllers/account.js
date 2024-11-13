@@ -1,11 +1,6 @@
 const User = require('../models/User');
-
-
-module.exports.renderHome = (req,res) => {
-    res.render('home');
-}
 module.exports.renderRegisterForm = (req,res) => {
-    res.render('users/registerForm')
+    res.render('accounts/registerForm')
 }
 module.exports.createLocalUser = async (req,res,next) => {
     try {
@@ -36,7 +31,7 @@ module.exports.loginUser = (req, res) => {
 };
 
 module.exports.renderLoginForm = (req,res) => { 
-    res.render('users/loginForm');
+    res.render('accounts/loginForm');
 }
 module.exports.logoutUser = (req,res,next)=> {
     req.logOut(function(err) {

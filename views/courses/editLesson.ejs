@@ -1,7 +1,7 @@
 <% layout('layouts/indexboilerplate') -%> 
 <div class="container mt-2" style="width: 80%;">     
     <h2>Sửa bài học</h2>     
-    <form id="editForm" action="/courses/<%= courseID %>/<%= lesson._id %>?_method=PUT" method="post" >         
+    <form id="editForm" action="/courses/<%= courseID %>/<%= lesson._id %>?_method=PUT" method="post" novalidate class="validated-form" >         
         <div class="mb-3">             
             <label for="title" class="form-label">Tiêu đề bài học</label>             
             <input type="text" class="form-control" id="title" name="course[title]" required value="<%= lesson.title %>">              

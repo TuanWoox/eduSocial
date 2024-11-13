@@ -22,7 +22,7 @@ module.exports.index = async (req, res) => {
     // Fetch questions with the selected sort order
     const questions = await Question.find().populate({
         path: 'author',
-        select: 'name _id'
+        select: 'name _id profilePic'
     })
     .sort(sortBy)  // Apply the sorting
     .skip((page - 1) * questionsPerPage)  // Skip questions for previous pages
@@ -84,7 +84,7 @@ module.exports.viewQuestion = async (req, res) => {
     .skip((page - 1) * commentsPerPage)
     .populate({
         path: 'author',
-        select: 'name _id',
+        select: 'name _id profilePic',
     })
     .populate({
         path: 'replyTo',
@@ -99,7 +99,6 @@ module.exports.viewQuestion = async (req, res) => {
     const totalPages = Math.ceil(totalComments / commentsPerPage);
     question.views += 1;
     await question.save();
-
     res.render('questions/show', {
         topic,
         question,

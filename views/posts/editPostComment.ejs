@@ -2,13 +2,13 @@
 
 <div class="container mt-5">
     <h2>Edit Comment</h2>
-    <form action="/posts/<%= comment.commentedOnPost %>/<%= comment._id %>?_method=PUT" method="POST">
+    <form action="/posts/<%= comment.commentedOnPost %>/<%= comment._id %>?_method=PUT" method="POST" novalidate class="validated-form">
         <div class="form-group">
             <label for="body">Comment:</label>
-            <textarea id="body" name="answer[body]" class="form-control" rows="5"><%= comment.body %></textarea>
+            <textarea id="body" name="answer[body]" class="form-control" rows="5" required><%= comment.body %></textarea>
         </div>
         <input type="hidden" name="answer[replyTo]" id="" value="<%= comment.replyTo  %>" readonly>
-        <button type="submit" class="btn btn-primary mt-2   ">Cập nhật bình luận</button>
+        <button type="submit" class="btn btn-primary mt-2">Cập nhật bình luận</button>
     </form>
     <a href="/posts/<%= comment.commentedOnPost %>" class="btn btn-secondary mt-3">Hủy</a>
 </div>

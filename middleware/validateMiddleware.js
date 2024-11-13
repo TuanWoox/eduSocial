@@ -1,5 +1,7 @@
-const { questionSchema,questionCommentSchema,postSchema,courseSchema, lessonSchema } = require('../joiValidate/validateSchema');
+const { questionSchema,questionCommentSchema,postSchema,courseSchema, lessonSchema, userSchema } = require('../joiValidate/validateSchema');
 const ExpressError = require('../utils/ExpressError');
+const { cloudinary } = require('../cloudinary/postCloud');
+
 module.exports.validateQuestion = async (req, res, next) => {
     const { title, body } = req.body.question;
     const tagsArray = req.body.question.tags.split(' ').filter(tag => tag.trim() !== ''); // Split and filter tags
@@ -77,6 +79,28 @@ module.exports.validateLesson = async (req,res,next) => {
     })
     if (error) {
         const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+module.exports.validateUser = async (req,res,next) => {
+    const {name,bio,dateOfBirth,facebook,github,linkedin} = req.body.user;
+    const {error} = userSchema.validate({
+        user:{
+            name,
+            bio,
+            dateOfBirth,
+            socialLinks: {
+                facebook,
+                github,
+                linkedin
+            }
+        }
+    })
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        cloudinary.uploader.destroy(req.file.filename);
         throw new ExpressError(msg, 400);
     } else {
         next();

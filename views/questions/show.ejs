@@ -5,7 +5,7 @@
             <!-- Question Title -->
             <h2 class="card-title"><%= question.title %></h1>
             <div class="d-flex justify-content-between text-muted">
-                <p class="mb-0">Đăng bởi <strong>by <%= question.author.name  %></strong> </p>
+                <p class="mb-0">Đăng bởi <strong> <a href="/users/<%= question.author._id %>" style="text-decoration: none;"><%= question.author.name  %></a></strong> </p>
                 <p class="mb-0">Ngày đăng: <strong><%= new Date(question.createdAt).toLocaleDateString() %> <%= new Date(question.createdAt).toLocaleTimeString() %></strong></p>
                 
 
@@ -49,8 +49,14 @@
                         
                         <!-- Left Side: Author Image -->
                         <div class="me-3 text-center">
-                            <img src="/pictures/user.png" alt="Author" class="rounded-circle" width="80" height="80">
-                            <small class="d-block mt-1"><strong><%= comment.author ? comment.author.name : 'Unknown' %></strong></small>
+                            <img src="<%= comment.author.profilePic.url || '/pictures/user.png' %>" alt="Author" class="rounded-circle" width="80" height="80">
+                            <small class="d-block mt-1">
+                                <a href="/users/<%= comment.author ? comment.author._id : '#' %>" style="color: black; text-decoration: none;">
+                                    <strong><%= comment.author ? comment.author.name : 'Unknown' %></strong>
+                                </a>
+                            </small>
+                            
+
                         </div>
                         
                         <!-- Right Side: Comment Content -->
