@@ -38,27 +38,27 @@ module.exports.questionCommentSchema = Joi.object({
         replyto: Joi.string()
     }).required()
 });
-
+//bỏ XSS
 module.exports.postSchema = Joi.object({
     post: Joi.object({
         title: Joi.string().required(),
-        content: Joi.string().escapeXSS().required()
+        content: Joi.string().required()
     }).required(),
     tags: Joi.array().items(Joi.string()).required()
 });
-
+//bỏ XSS
 module.exports.courseSchema = Joi.object({
     course: Joi.object({
         title: Joi.string().required(),
-        topic: Joi.string().valid('Coding', 'IT & Software', 'English').required(), // Restrict topic to 3 values
+        topic: Joi.string().valid('Lập trình', 'IT & Phần mềm', 'Ngoại ngữ').required(), // Restrict topic to 3 values
         description: Joi.string().required(),
     }).required()
 });
-
+//bỏ XSS
 module.exports.lessonSchema = Joi.object({
     lesson: Joi.object({
         title: Joi.string().required(),
-        content: Joi.string().escapeXSS().required()
+        content: Joi.string().required()
     }).required(),
 })
 

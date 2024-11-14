@@ -42,7 +42,9 @@
                                 <!-- Question User and Content -->
                                 <div class="d-flex align-items-start">
                                     <div class="user-content me-3">
-                                        <img src="<%= question.author.profilePic.url || '/pictures/user.png' %>" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <img src="<%= question.author.profilePic && question.author.profilePic.url ? question.author.profilePic.url : '/pictures/user.png' %>" 
+                                        class="img-fluid rounded-circle" 
+                                        style="width: 50px; height: 50px; object-fit: cover;">
                                     </div>
                                     <div class="nd">
                                         <a href="/questions/<%= question._id %>" class="text-decoration-none">

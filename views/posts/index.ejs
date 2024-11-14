@@ -56,7 +56,7 @@
                                         </a>
                                         <small class="text-muted"> <strong>Đăng bởi:</strong> <%= post.author.name %> vào <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></small>
                                         <div class="d-flex justify-content-start mt-2">
-                                            <a class="card-link btn btn-success btn-sm me-2" href="/questions/<%= post._id %>">Xem chi tiết</a>
+                                            <a class="card-link btn btn-success btn-sm me-2" href="/posts/<%= post._id %>">Xem chi tiết</a>
                                             <span class="me-3"><i class="bi bi-star-fill text-warning"></i> <%= post.upvotes - post.downvotes %></span>
                                             <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= post.comments.length %></span>
                                             <span><i class="bi bi-eye-fill"></i> <%= post.views %></span>
