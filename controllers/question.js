@@ -42,6 +42,54 @@ module.exports.index = async (req, res) => {
     });
 };
 
+//thêm(tìm kiếm khóa học)
+module.exports.Search = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const questionsPerPage = 15;
+    const searchQuery = req.query.searchQuery || ''; // Lấy từ khóa tìm kiếm từ query string
+
+    // Default sorting by newest
+    let sortBy = { createdAt: -1 }; // Sorting by newest by default
+    let sort = 'newest'; // Default sort option
+
+    // Check if sorting by views is requested
+    if (req.query.sort === 'views') {
+        sortBy = { views: -1 }; // Sort by views in descending order
+        sort = 'views';
+    }
+
+    try {
+        // Tìm kiếm bài viết theo title chứa searchQuery (không phân biệt chữ hoa/thường)
+        const questions = await Question.find({ 
+            title: { $regex: searchQuery, $options: 'i' } 
+        })
+        .populate({
+            path: 'author',
+            select: 'name _id profilePic'
+        })
+        .sort(sortBy)  // Apply the sorting
+        .skip((page - 1) * questionsPerPage)  // Skip questions for previous pages
+        .limit(questionsPerPage);  // Limit to the number of questions per page
+
+        const count = await Question.countDocuments({ 
+            title: { $regex: searchQuery, $options: 'i' } 
+        });
+
+        const totalPages = Math.ceil(count / questionsPerPage); // Total pages for the search result
+
+        res.render('questions/search', {
+            topic,
+            questions,
+            currentPage: page,
+            totalPages,
+            sort, // Pass the current sort option to the template
+            searchQuery // Pass searchQuery to render back to input box
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+};
 
 
 module.exports.creationForm = (req,res) => {

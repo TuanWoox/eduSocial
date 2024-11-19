@@ -1,4 +1,6 @@
 const Comment = require('../models/comment');
+const Notification = require('../models/notification');
+const Question = require('../models/question');
 
 const topic = {
     title: 'Hỏi đáp',
@@ -18,6 +20,22 @@ module.exports.sendAnswer = async (req, res) => {
     }
     const newQuestionComment = new Comment(newQuestionCommentData)
     await newQuestionComment.save();
+
+    // 2. Tìm chủ sở hữu bài viết
+    const question = await Question.findById(id).populate('author'); // Giả định Post có field `author` là ObjectId của User
+    if (question && question.author && question.author._id.toString() !== req.user._id.toString()) {
+        // 3. Tạo thông báo
+        const notification = new Notification({
+            recipient: question.author._id,
+            sender: req.user._id,
+            question: id,
+            comment: newQuestionComment._id,
+            message: `${req.user.name} đã bình luận CÂU HỎI của bạn.`,
+            isRead: false
+        });
+        await notification.save();
+    }
+
     res.redirect(`/questions/${id}`);
 };
 module.exports.formEditAnswer = async (req,res) => {

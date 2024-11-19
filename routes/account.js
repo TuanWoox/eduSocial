@@ -39,6 +39,25 @@ router.route('/login')
   passport.authenticate('local',{failureFlash: true, failureRedirect:'/users/login'}),
   accountControl.loginUser
 )
+// router.route('/login')
+//   .get(accountControl.renderLoginForm) // Render the login form
+//   .post(
+//     storeReturnTo, // Store the return URL before login
+//     accountControl.loginUser // Handle the login manually
+//   );
+
+//OTP
+router.route('/forgotPassword')
+.get(accountControl.showForgotForm)
+.post(accountControl.forgotPassword);
+
+router.route('/verify-otp')
+.get(accountControl.showVerifyForm)
+.post(accountControl.verifyOtp);
+
+router.route('/reset-password')
+.get(accountControl.showResetForm)
+.post(accountControl.resetPassword);
 
 // Google authentication (GET)
 

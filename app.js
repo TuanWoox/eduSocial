@@ -103,6 +103,9 @@ const userRoutes = require('./routes/user');
 const courseRoutes = require('./routes/course');
 const questionRoutes = require('./routes/question');
 const postRoutes = require('./routes/post');
+const notificationRoutes = require('./routes/notification');
+const memberRoutes = require('./routes/member')
+const aboutRoutes = require('./routes/about')
 const imageHandlerRoutes = require('./routes/imageHandler');
 
 
@@ -122,6 +125,11 @@ app.use('/api/imageHandler', imageHandlerRoutes);
 app.use('/courses', courseRoutes);
 app.use('/questions', questionRoutes);
 app.use('/posts', postRoutes);
+
+app.use('/notifications',notificationRoutes);
+app.use('/member',memberRoutes);
+app.use('/about',aboutRoutes);
+
 app.use('/', (req,res) => {
   res.render('home');
 })

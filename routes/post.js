@@ -11,6 +11,10 @@ const {validatePost} = require('../middleware/validateMiddleware')
   
 router.get('/', CatchAsync(postController.viewPost));
 
+//thêm(tìm kiếm bài viết)
+router.route('/search')
+.get(CatchAsync(postController.Search))
+
 router.route('/create')
 .get(isLoggedIn,postController.viewCreate)
 .post(isLoggedIn,validatePost,CatchAsync(postController.createPost));

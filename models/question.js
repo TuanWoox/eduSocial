@@ -30,6 +30,11 @@ const questionSchema = new Schema({
       type: Boolean,
       default: true
     },
+    //lưu comment
+    comments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'QuestionComment'  
+  }],
     views : {
         type: Number,
         default: 0

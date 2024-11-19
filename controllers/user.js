@@ -163,3 +163,4 @@ module.exports.viewUserCourses = async (req,res) => {
         totalPages: Math.ceil(count / perPage),
     });
 }
+

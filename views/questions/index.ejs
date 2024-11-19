@@ -1,6 +1,12 @@
 <% layout('layouts/indexboilerplate') -%>
 
 <div class="container mt-4">
+    <form action="/questions/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm câu hỏi" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
     <div class="row">
         <!-- Main Content (Left Side) -->
         <div class="col-lg-8 main-left">

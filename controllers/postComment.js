@@ -1,4 +1,6 @@
 const Comment = require('../models/comment');
+const Notification = require('../models/notification'); 
+const Post = require('../models/Post');
 
 const topic = {
     title: 'Bài viết',
@@ -8,6 +10,7 @@ const topic = {
 module.exports.sendAnswer = async (req, res) => {
     const id = req.params.id;
     const { body, replyTo } = req.body.answer;
+    //Tạo bình luận mới
     const newPostCommentData = {
         commentedOnPost: id,
         author: req.user._id,
@@ -18,6 +21,22 @@ module.exports.sendAnswer = async (req, res) => {
     }
     const newPostComment = new Comment(newPostCommentData);
     await newPostComment.save();
+
+    // 2. Tìm chủ sở hữu bài viết
+    const post = await Post.findById(id).populate('author'); // Giả định Post có field `author` là ObjectId của User
+    if (post && post.author && post.author._id.toString() !== req.user._id.toString()) {
+        // 3. Tạo thông báo
+        const notification = new Notification({
+            recipient: post.author._id,
+            sender: req.user._id,
+            post: id,
+            comment: newPostComment._id,
+            message: `${req.user.name} đã bình luận BÀI VIẾT của bạn.`,
+            isRead: false
+        });
+        await notification.save();
+    }
+
     req.flash('success', 'Bình luận thành công');
     res.redirect(`/posts/${id}`);
 };

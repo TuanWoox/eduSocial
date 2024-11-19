@@ -27,4 +27,5 @@ router.route('/:id')
 .get(CatchAsync(userControl.viewAUserInfo));
 
 
+
 module.exports = router;

@@ -52,6 +52,53 @@ module.exports.viewPost = async (req, res) => {
     });
 };
 
+//thêm(tìm kiếm bai viet)
+module.exports.Search = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const postsPerPage = 15;
+
+    let sortBy = { createdAt: -1 };  // Mặc định sắp xếp theo bài mới nhất
+    let sort = 'newest';  // Tuỳ chọn mặc định
+    const searchQuery = req.query.searchQuery || ''; // Lấy giá trị tìm kiếm từ query
+
+    if (req.query.sort === 'views') {
+        sortBy = { views: -1 };
+        sort = 'views';
+    }
+    if (req.query.sort === 'activity') {
+        sortBy = { updatedAt: -1 };
+        sort = 'activity';
+    }
+
+    try {
+        // Tìm kiếm bài viết theo title chứa searchQuery (không phân biệt chữ hoa/thường)
+        const posts = await Post.find({ title: { $regex: searchQuery, $options: 'i' } })
+            .populate({
+                path: 'author',
+                select: 'name _id profilePic'
+            })
+            .sort(sortBy)
+            .skip((page - 1) * postsPerPage)
+            .limit(postsPerPage);
+
+        const count = await Post.countDocuments({ title: { $regex: searchQuery, $options: 'i' } });
+        const totalPages = Math.ceil(count / postsPerPage);
+
+        res.render('posts/search', {
+            topic,
+            posts,  // Đổi thành posts để phù hợp với template
+            searchQuery,  // Đưa searchQuery vào để hiển thị lại trong input
+            currentPage: page,
+            totalPages,
+            sort
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+};
+
+
 //This is for viewing the form the create the post
 module.exports.viewCreate = (req,res) => {
     res.render('posts/create', {topic});

@@ -1,0 +1,64 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="row mt-4 p-4 justify-content-center">
+    <!-- Search Form -->
+    <form action="/courses/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm khóa học" aria-label="Tìm kiếm" aria-describedby="basic-addon2" value="<%= topic %>">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+</div>
+
+<div class="getback">
+    <--<a href="/courses">Trở về Danh sách Khóa học</a>
+</div>
+
+<!-- Display Courses -->
+<div class="row">
+    <% if (courses && courses.length > 0) { %>
+        <% courses.forEach(course => { %>
+            <div class="card mx-2 my-2 course" style="width: 234px; height: 400px;">
+                <img src="<%= course.coursethumbnail.url %>" class="card-img-top img-fluid mt-2" alt="..." style="object-fit: cover; height: 40%;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><%= course.title %></h5>
+                    <p class="card-text" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis;">
+                        <%= course.description.length > 50 ? course.description.slice(0, 50) + '...' : course.description %>
+                    </p>
+                    <a href="/courses/<%= course._id %>" class="btn btn-primary mt-auto">See the course</a>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <h2 class="ms-5">Hiện chưa có khóa học nào!</h2>
+    <% } %>
+</div>
+
+<!-- Pagination -->
+<div class="row mt-4 p-4 m-auto justify-content-center">
+    <% if (totalPages > 1) { %>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?searchQuery=<%= topic %>&page=<%= currentPage - 1 %>">Previous</a>
+                    </li>
+                <% } %>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?searchQuery=<%= topic %>&page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?searchQuery=<%= topic %>&page=<%= currentPage + 1 %>">Next</a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    <% } %>
+</div>
+<% if(currentUser) { %>
+<div class="row mb-3 ">
+    <a href="/courses/create" class="btn btn-info ms-4" style="width: 12%;">Tạo khóa học!</a>
+</div>
+<% } %>

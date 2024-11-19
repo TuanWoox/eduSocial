@@ -11,6 +11,10 @@ const {validateCourse, validateLesson} = require('../middleware/validateMiddlewa
 router.route('/')
 .get(CatchAsync(courseControl.index))
 
+//thêm(tìm kiếm khóa học)
+router.route('/search')
+.get(CatchAsync(courseControl.indexSearch))
+
 router.route('/create')
 .get(isLoggedIn,courseControl.createForm)
 .post(isLoggedIn,upload.single('coursethumbnail'),validateCourse,CatchAsync(courseControl.createCourse))

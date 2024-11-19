@@ -8,6 +8,10 @@ const {validateQuestion,validateQuestionComment} = require('../middleware/valida
 router.route('/')
 .get(CatchAsync(questionControl.index))
 
+//thêm(tìm kiếm câu hỏi)
+router.route('/search')
+.get(CatchAsync(questionControl.Search))
+
 router.route('/create')
 .get(isLoggedIn,questionControl.creationForm)
 .post(isLoggedIn,validateQuestion,CatchAsync(questionControl.createQuestion))

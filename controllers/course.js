@@ -14,11 +14,23 @@ module.exports.index = async (req, res) => {
     const page = req.query.page || 1; // Default to page 1 if no page query parameter
     const topic = req.query.topic || 'Lập trình'; // Default topic: 'IT & Phần mềm'
     const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
+    //thêm
+    const searchQuery = req.query.search || ''; // Capture search parameter
+
     // Build filter and sort options
     let query = { };
     if (topic) {
         query.topic = topic; // Filter by selected topic
     }
+    if (searchQuery) {
+        query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
+    }
+
+    //thêm
+    if (searchQuery) {
+        query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
+    }
+
     // Determine the sorting criteria
     let sortOptions = {};
     if (sortBy === 'createdAt') {
@@ -40,12 +52,41 @@ module.exports.index = async (req, res) => {
         topic,
         sortBy,
         courses,
+        //thêm
+        searchQuery,
+
         currentPage: page,
         totalPages: Math.ceil(count / perPage),
     });
 };
+//thêm(tìm kiếm khóa học)
+module.exports.indexSearch = async (req, res) => {
+    const perPage = 10; // Số khóa học trên mỗi trang
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại
+    const searchQuery = req.query.searchQuery || ''; // Lấy giá trị tìm kiếm từ query
 
+    try {
+        // Sử dụng $regex để tìm kiếm tiêu đề có chứa chuỗi trong searchQuery, không phân biệt hoa-thường
+        const courses = await Course.find({ title: { $regex: searchQuery, $options: 'i' } })
+            .populate('lessons', 'title _id')
+            .populate('author', 'name _id own_courses profilePic')
+            .skip((page - 1) * perPage)
+            .limit(perPage);
 
+        const count = await Course.countDocuments({ title: { $regex: searchQuery, $options: 'i' } });
+
+        res.render('courses/search', {
+            topic: searchQuery,
+            courses,
+            currentPage: page,
+            totalPages: Math.ceil(count / perPage),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+    
+};
 
 module.exports.createForm = async (req,res) => {
     res.render('courses/createCourse', {topic});
