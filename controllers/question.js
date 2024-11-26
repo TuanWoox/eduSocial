@@ -1,5 +1,7 @@
 const Question = require('../models/question');
 const Comment = require('../models/comment');
+const Tag = require('../models/tag');
+const { json } = require('express');
 const topic = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -32,12 +34,17 @@ module.exports.index = async (req, res) => {
     const totalQuestion = await Question.countDocuments();
     const totalPages = Math.ceil(totalQuestion / questionsPerPage);
 
-    // Render the page with the necessary data
+
+    //fetch the tag
+    const response = await fetch('http://localhost:5000/tags/popularTags');
+    const popularTags = await response.json();  // Corrected the method to .json()
+ 
     res.render('questions/index', {
         topic,
         questions,
         currentPage: page,
         totalPages,
+        popularTags,
         sort  // Pass the current sort option to the template
     });
 };
@@ -97,19 +104,54 @@ module.exports.creationForm = (req,res) => {
 }
 
 module.exports.createQuestion = async (req, res) => {
-    // Split tags by spaces and store them in an array
-    const tagsArray = req.body.question.tags.split(' ').filter(tag => tag.trim() !== '');
+    // Parse tags and extract the value field
+    const tagsArray = JSON.parse(req.body.question.tags)
+        .map(tag => tag.value) // Extract the 'value' field
+        .filter(tag => tag.trim() !== ''); // Remove empty or invalid tags
+
     const newQuestion = new Question({
         ...req.body.question,
-        tags: tagsArray, // Assign the tags array to the tags field,
-        author: req.user._id
+        author: req.user._id,
+        tags: [],
     });
+
+    // Create an array of promises to handle asynchronous tag updates
+    const tagPromises = tagsArray.map(async (element) => {
+        console.log(element);
+        let tag = await Tag.findOne({ name: element });
+        if (tag) { // Check if the tag exists
+            tag.questionsTagged.push(newQuestion.id); // Add the question ID to the questionsTagged array
+            newQuestion.tags.push(tag.id); // Add the tag's ID to the newQuestion tags array
+            await tag.save(); // Save the tag with the updated questionsTagged
+        } else {
+            // Create and save a new tag if it doesn't exist
+            const newTag = new Tag({ name: element });
+            newTag.questionsTagged.push(newQuestion.id); // Add the question ID to the new tag's questionsTagged
+            newQuestion.tags.push(newTag.id); // Add the new tag's ID to the newQuestion tags array
+            await newTag.save(); // Save the newly created tag
+        }
+    });
+
+    // Wait for all tag operations to finish
+    await Promise.all(tagPromises);
+
+    // Save the new question after all tags are updated
     await newQuestion.save();
+
+    // Provide feedback to the user
     req.flash('success', 'Tạo câu hỏi thành công!!!');
     res.redirect(`/questions/${newQuestion._id}`);
 };
+
+
+
 module.exports.viewEditQuestion = async (req,res) => {
     const question = await Question.findById(req.params.id)
+    .populate({
+        path: 'tags', // Populate the 'tags' field
+        select: 'name _id', // Choose the fields you want from the tag model
+    });
+    console.log(question);
     res.render('questions/edit', {topic,question});
 }
 
@@ -122,7 +164,12 @@ module.exports.viewQuestion = async (req, res) => {
     .populate({
         path: 'author',
         select: 'name _id',
+    })
+    .populate({
+        path: 'tags', // Populate the 'tags' field
+        select: 'name _id', // Choose the fields you want from the tag model
     });
+
     const query = {
         commentedOnQuestion: question._id
     }
@@ -158,14 +205,51 @@ module.exports.viewQuestion = async (req, res) => {
 };
 module.exports.editQuestion = async (req, res) => {
         const { id } = req.params; 
-        const updatedData = req.body.question; 
-        if (updatedData.tags) {
-            updatedData.tags = updatedData.tags.split(' ').filter(tag => tag.trim() !== '');
+        const tagsArray = JSON.parse(req.body.question.tags)
+        .map(tag => tag.value) // Extract the 'value' field
+        .filter(tag => tag.trim() !== ''); // Remove empty or invalid tags
+        const question = await Question.findById(id)
+        .populate({
+            path: 'tags', // Populate the 'tags' field
+            select: 'name _id', // Choose the fields you want from the tag model
+        });
+        const existingTagNames = question.tags.map(tag => tag.name);
+        const tagsToRemove = existingTagNames.filter(tagName => !tagsArray.includes(tagName));
+
+        for (let tagName of tagsToRemove) {
+            const tag = await Tag.findOne({ name: tagName });
+            console.log(tag);
+            if (tag) {
+                // Remove the question's _id from the tag's questionsTagged array
+                tag.questionsTagged = tag.questionsTagged.filter(questionId => !questionId.equals(id));
+                await tag.save();
+
+                question.tags = question.tags.filter(tag => tag.name !== tagName);
+            }
         }
-        const question = await Question.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
-        if (!question) {
-            return res.status(404).send('Question not found');
+
+        for (let newTagName of tagsArray) {
+            const existingTag = question.tags.find(tag => tag.name === newTagName);
+            if (!existingTag) {
+                // If tag doesn't exist in the current question's tags, find or create the tag
+                let tag = await Tag.findOne({ name: newTagName });
+                if (!tag) {
+                    tag = new Tag({ name: newTagName });
+                    await tag.save(); // Save the new tag if it doesn't exist
+                }
+                // Add the question's _id to the questionsTagged array of the tag
+                tag.questionsTagged.push(question._id);
+                await tag.save(); // Save the updated tag
+                // Add the tag to the question's tags
+                question.tags.push(tag._id);            }
         }
+
+        question.title = req.body.question.title;
+        question.body = req.body.question.body;
+
+        await question.save();
+    
+      
         req.flash('success', 'Chỉnh sửa câu hỏi thành công!!!');
         res.redirect(`/questions/${id}`);
 };

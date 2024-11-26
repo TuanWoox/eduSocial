@@ -15,8 +15,10 @@
             <div class="my-3">
                 <h6>Tags:</h6>
                 <% question.tags.forEach(tag => { %>
-                    <span class="badge bg-info me-1"><%= tag %></span>
-                <% }); %>
+                    <a href="/tags/questionsTagged/<%= tag._id %>" class="badge bg-info me-1 text-decoration-none text-white">
+                        <%= tag.name %>
+                    </a>
+                <% }); %> 
             </div>
 
             <!-- Question Body -->

@@ -3,6 +3,7 @@ const Post = require('../models/Post');
 const Course = require('../models/course');
 const Comment = require('../models/comment');
 const User = require('../models/User');
+const Notification = require('../models/notification');
 module.exports.isLoggedIn = (req,res,next) => {
     //isAuthenticated() is used to check if the cookie for the session is still valid!
     if(!req.isAuthenticated())
@@ -73,4 +74,12 @@ module.exports.isYou = async (req,res,next) => {
         return res.redirect(`/users/${req.params.id}`);
     }
     next();
+}
+module.exports.isYourNotification = async (req,res,next) => {
+    const notification = await Notification.findById(req.params.id)
+    if(!notification.equals(req.user_id))
+    {
+        req.flash('error', 'Bạn không có quyền để làm như thế!!!');
+        return res.redirect(`/users/${req.user_id}`);
+    }
 }

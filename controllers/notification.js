@@ -39,16 +39,11 @@ module.exports.getUserNotifications = async (req, res) => {
 module.exports.markAsRead = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(id);
         const notification = await Notification.findById(id);
-
         if (!notification) {
             return res.status(404).json({ message: 'Thông báo không tồn tại.' });
         }
-
-        if (notification.recipient.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Bạn không có quyền thực hiện thao tác này.' });
-        }
-
         notification.isRead = true;
         await notification.save();
 

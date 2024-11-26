@@ -117,19 +117,21 @@
         <div class="col-lg-4 main-right">
             <!-- Popular Tags Section -->
             <div class="common-tag bg-light p-4 rounded mb-4 shadow-sm">
-                <h3 class="text-danger mb-3">Tag Phổ biến</h3>
-                <div class="tag-item d-flex justify-content-between align-items-center mb-3">
-                    <p class="mb-0">C#</p>
-                    <p class="mb-0">x138</p>
-                </div>
-                <div class="tag-item d-flex justify-content-between align-items-center mb-3">
-                    <p class="mb-0">JavaScript</p>
-                    <p class="mb-0">x102</p>
+                <h3 class="text-info mb-3">Tag Phổ biến</h3>
+                <div id="popular-tags-list">
+                    <!-- Loop through the popularTags array and display each tag -->
+                    <% popularTags.forEach(tag => { %>
+                        <div class="tag-item d-flex justify-content-between align-items-center mb-3">
+                            <p class="mb-0" style="color: red;"><%= tag.name %></p>
+                            <p class="mb-0"><a href="/tags/questionsTagged/<%= tag._id %>" style="text-decoration: none;">x<%= tag.numberOfQuestions %></a></p>
+                        </div>
+                    <% }) %>
                 </div>
                 <div class="morebtn text-end">
-                    <a href="#" class="text-decoration-none text-primary">Xem thêm...</a>
+                    <a href="/tags?page=1&sort=numberOfPostsAndQuestions" class="text-decoration-none text-primary">Xem chi tiết</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>

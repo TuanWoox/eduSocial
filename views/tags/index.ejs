@@ -1,0 +1,67 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<div class="container mt-4">
+    <form action="/tags/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm tag" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+    <!-- Sorting Options -->
+    <div class="sorting mb-4">
+        <form method="GET" action="/tags">
+            <div class="form-group">
+                <h4><label for="sort">Sort by:</label></h4>
+                <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                    <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+                    <option value="activity" <%= sort === 'activity' ? 'selected' : '' %>>Activity</option>
+                    <option value="numberOfPostsAndQuestions" <%= sort === 'numberOfPostsAndQuestions' ? 'selected' : '' %>>Number of Posts and Questions</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tag List -->
+    <div class="tag-list mb-4">
+        <% if (tags && tags.length > 0) { %>
+            <div class="row">
+                <% tags.forEach(tag => { %>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-center"><%= tag.name %></h5>
+                                
+                                <!-- Number of Posts -->
+                                <p class="card-text">
+                                    <strong>Number of Posts: </strong>
+                                    <a href="/tags/postsTagged/<%= tag._id %>"><%= tag.postsTagged  %></a>
+                                </p>
+                                
+                                <!-- Number of Questions -->
+                                <p class="card-text">
+                                    <strong>Number of Questions: </strong>
+                                    <a href="/tags/questionsTagged/<%= tag._id %>"><%= tag.questionsTagged %></a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p>No tags available.</p>
+        <% } %>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="/tags?page=<%= currentPage - 1 %>&sort=<%= sort %>">&laquo; Previous</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="/tags?page=<%= i %>&sort=<%= sort %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+            <a href="/tags?page=<%= currentPage + 1 %>&sort=<%= sort %>">Next &raquo;</a>
+        <% } %>
+    </div>
+</div>

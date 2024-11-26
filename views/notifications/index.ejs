@@ -7,7 +7,6 @@
             <% notifications.forEach(notification => { %>
                 <div class="list-group-item <%= notification.isRead ? '' : 'bg-light' %>">
                     <p>
-                        <strong><%= notification.sender.name %></strong>
                         <%= notification.message %>
                     </p>
                     <% if (notification.post) { %>
@@ -27,8 +26,10 @@
 
 <script>
     async function markAsRead(id) {
+        console.log(id);
         try {
-            const response = await fetch(`/notification/${id}/read`, { method: 'PATCH' });
+            const response = await fetch(`/notifications/${id}/read`, { method: 'PATCH' });
+            console.log(response);
             if (response.ok) {
                 location.reload();
             } else {

@@ -4,7 +4,9 @@ const { cloudinary } = require('../cloudinary/postCloud');
 
 module.exports.validateQuestion = async (req, res, next) => {
     const { title, body } = req.body.question;
-    const tagsArray = req.body.question.tags.split(' ').filter(tag => tag.trim() !== ''); // Split and filter tags
+    const tagsArray = JSON.parse(req.body.question.tags)
+            .map(tag => tag.value) // Extract only the 'value' field
+            .filter(tag => tag.trim() !== ''); // Remove empty or invalid tags
     const { error } = questionSchema.validate(
         {
             question: {
@@ -37,7 +39,9 @@ module.exports.validateQuestionComment = async (req, res, next) => {
 };
 module.exports.validatePost = async (req,res,next) => {
     const {title,content} = req.body.post;
-    const tagsArray = req.body.post.tags.split(' ').filter(tag => tag.trim() !== ''); // Split and filter tags
+    const tagsArray = JSON.parse(req.body.post.tags)
+            .map(tag => tag.value) // Extract only the 'value' field
+            .filter(tag => tag.trim() !== ''); // Remove empty or invalid tags
     const {error} = postSchema.validate( {
         post: {
             title,

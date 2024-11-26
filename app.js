@@ -107,6 +107,7 @@ const notificationRoutes = require('./routes/notification');
 const memberRoutes = require('./routes/member')
 const aboutRoutes = require('./routes/about')
 const imageHandlerRoutes = require('./routes/imageHandler');
+const tagRoutes = require('./routes/tag');
 
 
 //Catch flash message and user!
@@ -125,7 +126,7 @@ app.use('/api/imageHandler', imageHandlerRoutes);
 app.use('/courses', courseRoutes);
 app.use('/questions', questionRoutes);
 app.use('/posts', postRoutes);
-
+app.use('/tags', tagRoutes);
 app.use('/notifications',notificationRoutes);
 app.use('/member',memberRoutes);
 app.use('/about',aboutRoutes);

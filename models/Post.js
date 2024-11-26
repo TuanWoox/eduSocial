@@ -11,11 +11,10 @@ const postSchema = new Schema({
         type: String,
         required: [true , 'Hãy nhập tựa đề bài viết']
     },
-    tags: [
-    {
-        type: String
-      }
-    ]
+    tags: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Tag',
+    }]
     ,
     content:{
         type: String,

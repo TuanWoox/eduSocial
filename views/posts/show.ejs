@@ -13,7 +13,16 @@
         <p class="mb-0 text-muted"><strong>Đăng vào:</strong> <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></p>
 
     </div>
-
+ 
+    <!-- Tags -->
+    <div class="my-3">
+        <h6>Tags:</h6>
+        <% post.tags.forEach(tag => { %>
+            <a href="/tags/postsTagged/<%= tag._id %>" class="badge bg-info me-1 text-decoration-none text-white">
+                <%= tag.name %>
+            </a>
+        <% }); %> 
+    </div>
     <!-- Post Content -->
     <div>
         <p class="h5 font-weight-bold">Nội dung:</p>

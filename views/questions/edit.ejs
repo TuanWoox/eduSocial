@@ -26,7 +26,8 @@
 
         <div class="mb-3">
             <label for="tags" class="form-label">Tags (cách nhau bằng dấu space)</label>
-            <input type="text" class="form-control" id="tags" name="question[tags]" required value="<%= question.tags.join(' ') %>">
+            <input type="text" class="form-control" id="tags" name="question[tags]" required 
+                value='<%= JSON.stringify(question.tags.map(tag => tag.name)) %>'>
             <div class="valid-feedback">
                 Looks good!
             </div>
@@ -39,3 +40,56 @@
         <a href="/questions/<%= question._id  %>" class="btn btn-info">Hủy chỉnh sửa</a>
     </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify@4.4.0/dist/tagify.min.js"></script>
+<script>
+    const tagInputElement = document.querySelector("#tags");
+
+    const tagify = new Tagify(tagInputElement, {
+        whitelist: [],
+        dropdown: {
+            enabled: 0,
+            closeOnSelect: true
+        }
+    });
+
+    // Fetch tags immediately when the page loads
+    async function fetchInitialTags() {
+        try {
+            const response = await fetch('http://localhost:5000/tags/suggest?letter=');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const arrayTags = await response.json();
+            console.log('Initial fetched tags:', arrayTags);
+
+            // Update the Tagify whitelist
+            tagify.whitelist = arrayTags.map(tag => tag.name);
+        } catch (error) {
+            console.error('Error fetching initial tags:', error);
+        }
+    }
+
+    // Fetch tags on page load
+    window.addEventListener('load', fetchInitialTags);
+
+    // Fetch tags on change
+    tagInputElement.addEventListener('change', async (e) => {
+        const query = e.target.value.trim();
+        console.log('Input query:', query);
+
+        if (query.length > 0) {
+            try {
+                const response = await fetch(`http://localhost:5000/tags/suggest?letter=${query}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const arrayTags = await response.json();
+                console.log('Fetched tags on change:', arrayTags);
+
+                // Update the Tagify whitelist
+                tagify.whitelist = arrayTags.map(tag => tag.name);
+                tagify.dropdown.show(query); // Show the suggestions dropdown
+            } catch (error) {
+                console.error('Error fetching tag suggestions on change:', error);
+            }
+        }
+    });
+</script>
