@@ -5,7 +5,8 @@ const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Bài viết',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
-    find: 'bài viết'
+    find: 'bài viết',
+    linkCreate: '/posts/create'
 }
 
 //This is for post index
@@ -31,9 +32,14 @@ module.exports.viewPost = async (req, res) => {
     }
 
     // Fetch post with the selected sort order
-    const post = await Post.find().populate({
+    const post = await Post.find()
+    .populate({
         path: 'author',
         select: 'name _id profilePic'
+    })
+    .populate({
+        path: 'tags', // Populate the 'tags' field
+        select: 'name _id', // Choose the fields you want from the tag model
     })
     .sort(sortBy)  // Apply the sorting
     .skip((page - 1) * postsPerPage)  // Skip post for previous pages
@@ -226,7 +232,6 @@ module.exports.editPost = async (req, res) => {
             path: 'tags', // Populate the 'tags' field
             select: 'name _id', // Choose the fields you want from the tag model
     });
-    console.log(post);
     const tagsArray = JSON.parse(req.body.post.tags)
         .map(tag => tag.value) // Extract the 'value' field
         .filter(tag => tag.trim() !== ''); // Remove empty or invalid tags
@@ -236,7 +241,6 @@ module.exports.editPost = async (req, res) => {
 
     for (let tagName of tagsToRemove) {
         const tag = await Tag.findOne({ name: tagName });
-        console.log(tag);
         if (tag) {
             // Remove the question's _id from the tag's questionsTagged array
             tag.postsTagged = tag.postsTagged.filter(postId => !postId.equals(id));
@@ -307,6 +311,5 @@ module.exports.uploadTinyMCE = async (req, res) => {
 
 module.exports.deleteTinyMCE = async (req,res) => {
     const filename = decodeURIComponent(req.params.filename)
-    console.log(filename);
     await cloudinary.uploader.destroy(filename);
 }

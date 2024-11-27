@@ -53,15 +53,55 @@
     </div>
 
     <!-- Pagination Controls -->
-    <div class="pagination">
-        <% if (currentPage > 1) { %>
-            <a href="/tags?page=<%= currentPage - 1 %>&sort=<%= sort %>">&laquo; Previous</a>
+    <div class="d-flex justify-content-center">
+        <% if (totalPages > 1) { %> <!-- Show pagination only if there are multiple pages -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- Previous button -->
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+    
+                    <!-- First page -->
+                    <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                        <a class="page-link" href="?page=1&sort=<%= sort %>">1</a>
+                    </li>
+    
+                    <!-- Left ellipsis -->
+                    <% if (currentPage > 4) { %>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <% } %>
+    
+                    <!-- Pages around the current page -->
+                    <% for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+                        </li>
+                    <% } %>
+    
+                    <!-- Right ellipsis -->
+                    <% if (currentPage < totalPages - 3) { %>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <% } %>
+    
+                    <!-- Last page -->
+                    <% if (totalPages > 1) { %>
+                        <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>&sort=<%= sort %>"><%= totalPages %></a>
+                        </li>
+                    <% } %>
+    
+                    <!-- Next button -->
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         <% } %>
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="/tags?page=<%= i %>&sort=<%= sort %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
-        <% } %>
-        <% if (currentPage < totalPages) { %>
-            <a href="/tags?page=<%= currentPage + 1 %>&sort=<%= sort %>">Next &raquo;</a>
-        <% } %>
-    </div>
+    </div>       
+</div>
 </div>

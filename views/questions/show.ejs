@@ -5,7 +5,19 @@
             <!-- Question Title -->
             <h2 class="card-title"><%= question.title %></h1>
             <div class="d-flex justify-content-between text-muted">
-                <p class="mb-0">Đăng bởi <strong> <a href="/users/<%= question.author._id %>" style="text-decoration: none;"><%= question.author.name  %></a></strong> </p>
+                <div style="display: flex; align-items: center;">
+                    
+                    <p class="mb-0">Đăng bởi <strong> 
+                        <a href="/users/<%= question.author._id %>" style="text-decoration: none;">
+                            <%= question.author.name %>
+                        </a></strong>
+                    </p>
+                    <div class="user-content ms-3">
+                        <img src="<%= question.author.profilePic && question.author.profilePic.url ? question.author.profilePic.url : '/pictures/user.png' %>" 
+                        class="img-fluid rounded-circle" 
+                        style="width: 50px; height: 50px; object-fit: cover;">
+                    </div>
+                </div>                
                 <p class="mb-0">Ngày đăng: <strong><%= new Date(question.createdAt).toLocaleDateString() %> <%= new Date(question.createdAt).toLocaleTimeString() %></strong></p>
                 
 
@@ -21,9 +33,11 @@
                 <% }); %> 
             </div>
 
-            <!-- Question Body -->
-            <div class="mt-4">
-                <p class="lead"><%= question.body %></p>
+                <!-- Questionbody Content -->
+            <div class="bg-light p-4 rounded border border-secondary shadow-sm">
+                <p class="lead mb-0" style="font-size: 1.2rem; line-height: 1.8;">
+                    <%= question.body %>
+                </p>
             </div>
         </div>
     </div>
@@ -31,11 +45,11 @@
     <div class="container-fluid m-3">
         <div class="d-flex justify-content-between">
             <!-- Edit button aligned to the left -->
-            <a class="card-link btn btn-info me-2" href="/questions/<%=question._id%>/edit">Edit</a>
+            <a class="card-link btn btn-info me-2 btn-sm" href="/questions/<%=question._id%>/edit">Edit</a>
             
             <!-- Delete form aligned to the right -->
             <form action="/questions/<%=question._id%>?_method=DELETE" method="POST" class="me-4">
-                <button class="btn btn-danger">Delete</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
             </form>
         </div>
     </div>

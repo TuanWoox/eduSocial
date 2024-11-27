@@ -5,14 +5,14 @@ const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Tất cả khóa học',
     description: 'Hàng trăm khóa học miễn phí được xây dựng bởi EduSocial và cộng đồng!',
-    find: 'câu khóa học'
-
+    find: 'câu khóa học',
+    linkCreate: '/courses/create'
 }
 
 module.exports.index = async (req, res) => {
     const perPage = 10; // Number of courses per page
     const page = req.query.page || 1; // Default to page 1 if no page query parameter
-    const topic = req.query.topic || 'Lập trình'; // Default topic: 'IT & Phần mềm'
+    const topicSearch = req.query.topicSearch || 'Lập trình'; // Default topic: 'IT & Phần mềm'
     const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
     //thêm
     const searchQuery = req.query.search || ''; // Capture search parameter
@@ -20,7 +20,7 @@ module.exports.index = async (req, res) => {
     // Build filter and sort options
     let query = { };
     if (topic) {
-        query.topic = topic; // Filter by selected topic
+        query.topic = topicSearch; // Filter by selected topic
     }
     if (searchQuery) {
         query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
@@ -41,22 +41,25 @@ module.exports.index = async (req, res) => {
         sortOptions = { studentCount : -1}
     }
     // Get courses with the filtering and sorting applied
-    const courses = await Course.find({topic: topic})
+    const courses = await Course.find({topic: topicSearch})
         .skip((perPage * page) - perPage)
         .limit(perPage)
         .sort(sortOptions);
     // Get total number of courses for pagination
     const count = await Course.countDocuments(query);
     // Render the page with courses, topic, and pagination info
+
     res.render('courses/index', {
-        topic,
+        topicSearch,
         sortBy,
         courses,
+        topic,
         //thêm
         searchQuery,
 
         currentPage: page,
         totalPages: Math.ceil(count / perPage),
+        
     });
 };
 //thêm(tìm kiếm khóa học)

@@ -5,7 +5,8 @@ const { json } = require('express');
 const topic = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
-    find: 'câu hỏi'
+    find: 'câu hỏi',
+    linkCreate: '/questions/create'
 }
 module.exports.index = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -22,9 +23,14 @@ module.exports.index = async (req, res) => {
     }
 
     // Fetch questions with the selected sort order
-    const questions = await Question.find().populate({
+    const questions = await Question.find()
+    .populate({
         path: 'author',
         select: 'name _id profilePic'
+    })
+    .populate({
+        path: 'tags', // Populate the 'tags' field
+        select: 'name _id', // Choose the fields you want from the tag model
     })
     .sort(sortBy)  // Apply the sorting
     .skip((page - 1) * questionsPerPage)  // Skip questions for previous pages
@@ -117,7 +123,6 @@ module.exports.createQuestion = async (req, res) => {
 
     // Create an array of promises to handle asynchronous tag updates
     const tagPromises = tagsArray.map(async (element) => {
-        console.log(element);
         let tag = await Tag.findOne({ name: element });
         if (tag) { // Check if the tag exists
             tag.questionsTagged.push(newQuestion.id); // Add the question ID to the questionsTagged array
@@ -151,7 +156,6 @@ module.exports.viewEditQuestion = async (req,res) => {
         path: 'tags', // Populate the 'tags' field
         select: 'name _id', // Choose the fields you want from the tag model
     });
-    console.log(question);
     res.render('questions/edit', {topic,question});
 }
 
@@ -218,7 +222,6 @@ module.exports.editQuestion = async (req, res) => {
 
         for (let tagName of tagsToRemove) {
             const tag = await Tag.findOne({ name: tagName });
-            console.log(tag);
             if (tag) {
                 // Remove the question's _id from the tag's questionsTagged array
                 tag.questionsTagged = tag.questionsTagged.filter(questionId => !questionId.equals(id));

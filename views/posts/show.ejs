@@ -1,39 +1,69 @@
 <% layout('./layouts/indexboilerplate') -%>
 <div class="container mt-4">
-    <!-- Back to Post List Button -->
-    
+<div class="card shadow-sm">
+    <div class="card-body">
     
     <!-- Post Title -->
-    <h1 class="display-4 text-primary mb-4"><%= post.title %></h1>
+    <h1 class="display-4 text-primary mb-4 "><%= post.title %></h1>
 
     <!-- Post Info (Author and Views) -->
-    <div class="d-flex mb-4">
-        <p class="mb-0 me-3">Đăng bởi <strong> <a href="/users/<%= post.author._id %>" style="text-decoration: none;"><%= post.author.name  %></a></strong> </p>
-        <p class="mb-0 text-muted me-3"><strong>Lượt xem:</strong> <%= post.views %></p>
-        <p class="mb-0 text-muted"><strong>Đăng vào:</strong> <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></p>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <!-- Author Info with Avatar -->
+        <div class="d-flex align-items-center">
+            
+            <p class="mb-0">
+                Đăng bởi 
+                <strong>
+                    <a href="/users/<%= post.author._id %>" class="text-decoration-none text-dark">
+                        <%= post.author.name %>
+                    </a>
+                </strong>
+            </p>
+            <img src="<%= post.author.profilePic && post.author.profilePic.url ? post.author.profilePic.url : '/pictures/user.png' %>" 
+                        class="img-fluid rounded-circle" 
+                        style="width: 50px; height: 50px; object-fit: cover;">
+        </div>
 
+       
+
+        <!-- Post Date -->
+        <p class="mb-0 text-muted">
+            <strong>Đăng vào:</strong> <%= new Date(post.createdAt).toLocaleDateString() %> 
+            <%= new Date(post.createdAt).toLocaleTimeString() %>
+        </p>
     </div>
- 
+    <div>
+         <!-- Post Views -->
+         <p class="mb-0 text-muted">
+            <strong>Lượt xem:</strong> <%= post.views %>
+        </p>
+    </div>
+
     <!-- Tags -->
     <div class="my-3">
-        <h6>Tags:</h6>
+        <h6 class="mb-2">Tags:</h6>
         <% post.tags.forEach(tag => { %>
             <a href="/tags/postsTagged/<%= tag._id %>" class="badge bg-info me-1 text-decoration-none text-white">
                 <%= tag.name %>
             </a>
         <% }); %> 
     </div>
+
     <!-- Post Content -->
-    <div>
-        <p class="h5 font-weight-bold">Nội dung:</p>
-        <p class="lead m-2"><%- post.content %></p>
+    <div class="bg-light p-4 rounded border border-secondary shadow-sm">
+        <p class="lead mb-0" style="font-size: 1.2rem; line-height: 1.8;">
+            <%- post.content %>
+        </p>
     </div>
+</div>
+</div>
+
     <% if(currentUser && post.author.equals(currentUser._id) ) {%>
     <!-- Edit and Delete Buttons -->
     <div class="d-flex justify-content-between mt-4">
-        <a class="btn btn-info btn-lg" href="/posts/<%= post._id %>/edit">Edit</a> 
+        <a class="btn btn-info btn-sm" href="/posts/<%= post._id %>/edit">Edit</a> 
         <form action="/posts/<%= post._id %>?_method=DELETE" method="POST">
-            <button type="submit" class="btn btn-danger btn-lg">Delete</button>
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
         </form>
     </div>
     <% } %>

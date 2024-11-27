@@ -2,12 +2,24 @@ const Tag = require('../models/tag');
 const Question = require('../models/question');
 const Post = require('../models/Post');
 
-const topic = {
+const topicQuestion = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
-    find: 'câu hỏi'
+    find: 'câu hỏi',
+    linkCreate: '/questions/create'
+}
+const topicPost = {
+    title: 'Bài viết',
+    description: 'Chia sẻ kiến thức, cùng nhau phát triển',
+    find: 'bài viết',
+    linkCreate: '/posts/create'
 }
 
+const topicTag = {
+    title: 'Tag',
+    description: 'Tất cả tag được xây dựng bởi cộng đồng',
+    find: 'tag',
+}
 module.exports.indexAll = async (req, res) => {
     try {
         // Extract pagination and sorting query parameters
@@ -29,10 +41,28 @@ module.exports.indexAll = async (req, res) => {
                             { $size: "$postsTagged" },
                             { $size: "$questionsTagged" }
                         ]
-                    }
+                    },
+                    createdAt: 1,  // Include createdAt
+                    updatedAt: 1   // Include updatedAt
                 }
             }
         ];
+        
+        // Add sorting based on the sort parameter
+        if (sort === 'newest') {
+            pipeline.push(
+                { $sort: { createdAt: -1 } } // Sort by creation date (newest first)
+            );
+        } else if (sort === 'activity') {
+            pipeline.push(
+                { $sort: { updatedAt: -1 } } // Sort by activity (latest update)
+            );
+        } else if (sort === 'numberOfPostsAndQuestions') {
+            pipeline.push(
+                { $sort: { totalPostsAndQuestions: -1 } } // Sort by total posts and questions
+            );
+        }
+        
 
         // Add sorting based on the sort parameter
         if (sort === 'newest') {
@@ -52,12 +82,11 @@ module.exports.indexAll = async (req, res) => {
         // Add pagination to the aggregation
         pipeline.push(
             { $skip: skip },
-            { $limit: perPage }
+            { $limit: perPage },
         );
-
         // Execute the aggregation query
         const tags = await Tag.aggregate(pipeline);
-
+        
         // Get total number of tags for pagination (we need a separate count query)
         const totalTags = await Tag.countDocuments();
         const totalPages = Math.ceil(totalTags / perPage);
@@ -65,7 +94,7 @@ module.exports.indexAll = async (req, res) => {
         // Render the page with the tags and pagination data
         res.render('tags/index', {
             tags, // Pass tags to the view
-            topic,
+            topic: topicTag,
             currentPage: parseInt(page),
             totalPages,
             sort
@@ -118,7 +147,7 @@ module.exports.indexQuestionsTagsById = async (req, res) => {
             .limit(perPage)
             .sort(sortOption)
             .populate('author', 'name profilePic')  // Populate only the fields you need from the author
-            .populate('tags', 'name')  // Populate the tags field with only the tag name
+            .populate('tags', 'name _id')  // Populate the tags field with only the tag name
             .exec();
 
         // Get total number of questions for pagination
@@ -136,7 +165,7 @@ module.exports.indexQuestionsTagsById = async (req, res) => {
             currentPage: parseInt(page),
             totalPages,
             sort,
-            topic,
+            topic: topicQuestion,
             popularTags
         });
     } catch (error) {
@@ -182,7 +211,7 @@ module.exports.indexPostsTagsById = async (req, res) => {
             .limit(perPage)
             .sort(sortOption)
             .populate('author', 'name profilePic')  // Populate only the fields you need from the author
-            .populate('tags', 'name')  // Populate the tags field with only the tag name
+            .populate('tags', 'name _id')  // Populate the tags field with only the tag name
             .exec();
 
         // Get total number of posts for pagination
@@ -201,9 +230,8 @@ module.exports.indexPostsTagsById = async (req, res) => {
             totalPages,
             sort,
             popularTags,
-            topic
+            topic: topicPost
         });
-        console.log()
     } catch (error) {
         console.error(error);
         res.status(500).send('Something went wrong while retrieving posts for this tag.');
@@ -234,7 +262,6 @@ module.exports.findPopularTags = async (req, res) => {
             { $limit: 10 }
         ]);
    
-        console.log(tags);
         // Check if we have tags to display
         if (!tags || tags.length === 0) {
             return res.status(404).send('No popular question tags found.');
@@ -303,14 +330,14 @@ module.exports.searchTag = async (req, res) => {
             name: { $regex: searchQuery, $options: 'i' }
         });
         const totalPages = Math.ceil(totalTags / perPage);
-        console.log(tags);
+ 
         // Render the page with the tags and pagination data
         res.render('tags/search', {
             tags,
             searchQuery,
             currentPage: parseInt(page),
             totalPages,
-            topic,
+            topic: topicTag,
             searchQuery
         });
 
