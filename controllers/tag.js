@@ -261,12 +261,8 @@ module.exports.findPopularTags = async (req, res) => {
             // Limit the result to 10 most popular tags
             { $limit: 10 }
         ]);
-   
-        // Check if we have tags to display
-        if (!tags || tags.length === 0) {
-            return res.status(404).send('No popular question tags found.');
-        }
 
+       
         // Send the tags as a JSON response
         res.status(200).json(tags);
 
