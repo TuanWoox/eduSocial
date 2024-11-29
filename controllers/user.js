@@ -128,39 +128,92 @@ module.exports.viewUserPosts = async (req,res) => {
         sort  // Pass the current sort option to the template
     });
 }
-module.exports.viewUserCourses = async (req,res) => {
+module.exports.viewUserCourses = async (req, res) => {
     const perPage = 10; // Number of courses per page
     const page = req.query.page || 1; // Default to page 1 if no page query parameter
-    const topic = req.query.topic || 'Lập trình'; // Default topic: 'IT & Phần mềm'
-    const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
-    // Build filter and sort options
-    let query = { };
-    if (topic) {
-        query.topic = topic; // Filter by selected topic
+    const topicSearch = req.query.topicSearch || 'Lập trình'; // Default topic: 'Lập trình'
+    const sortBy = req.query.sortBy || 'highestRated'; // Default sort: 'highestRated'
+    const searchQuery = req.query.search || ''; // Capture search parameter
+
+    // Build filter options
+    let query = {};
+    if (topicSearch) {
+        query.topic = topicSearch; // Filter by selected topic
     }
-    // Determine the sorting criteria
+    if (searchQuery) {
+        query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
+    }
+
+    // Define the sorting criteria
     let sortOptions = {};
-    if (sortBy === 'createdAt') {
-        sortOptions = { createdAt: -1 }; // Sort by creation date, newest first
-    } else if (sortBy === 'activity') {
+    if (sortBy === 'activity') {
         sortOptions = { updatedAt: -1 }; // Sort by last updated date
-    } else if(sortBy === 'student') {
-        sortOptions = { studentCount : -1}
+    } else if (sortBy === 'student') {
+        sortOptions = { studentCount: -1 }; // Sort by number of students enrolled
+    } else if (sortBy === 'highestRated') {
+        // Aggregate by average rating for each course and then sort by it
+        const courses = await Course.aggregate([
+            {
+                $match: query // Apply filters (topicSearch, searchQuery)
+            },
+            {
+                $lookup: {
+                    from: 'ratings', // Join with Rating collection
+                    localField: '_id',
+                    foreignField: 'courseRated',
+                    as: 'ratings'
+                }
+            },
+            {
+                $addFields: {
+                    averageRating: {
+                        $avg: "$ratings.rating" // Calculate the average rating for each course
+                    }
+                }
+            },
+            {
+                $sort: { averageRating: -1 } // Sort courses by average rating in descending order
+            },
+            {
+                $skip: (perPage * page) - perPage // Pagination
+            },
+            {
+                $limit: perPage // Limit results to perPage
+            }
+        ]);
+
+        // Get total number of courses for pagination
+        const count = await Course.countDocuments(query);
+        
+        return res.render('users/courseUserShow', {
+            topic,
+            topicSearch,
+            sortBy,
+            courses,
+            searchQuery,
+            currentPage: page,
+            totalPages: Math.ceil(count / perPage),
+        });
     }
-    // Get courses with the filtering and sorting applied
-    const courses = await Course.find({author: req.params.id,topic: topic})
+
+    // If not sorted by highestRated, just query normally
+    const courses = await Course.find({ author: req.params.id, topic: topicSearch })
         .skip((perPage * page) - perPage)
         .limit(perPage)
         .sort(sortOptions);
+
     // Get total number of courses for pagination
     const count = await Course.countDocuments(query);
-    // Render the page with courses, topic, and pagination info
+    
     res.render('users/courseUserShow', {
         topic,
+        topicSearch,
         sortBy,
         courses,
+        searchQuery,
         currentPage: page,
         totalPages: Math.ceil(count / perPage),
     });
-}
+};
+
 

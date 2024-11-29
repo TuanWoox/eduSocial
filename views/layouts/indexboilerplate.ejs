@@ -9,6 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify@4.4.0/dist/tagify.css" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheet/indextemplate.css"> 
     <link rel="stylesheet" href="/stylesheet/course.css">
+    <link rel="stylesheet" href="/stylesheet/style.css">
+    <link rel="stylesheet" href="/stylesheet/starability-all.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
 
     <style>
       /* Add hover effect for sidebar items */
@@ -102,6 +106,7 @@
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                     <li><a class="dropdown-item" href="/users/<%= currentUser._id %>"><i class="bi bi-info-circle-fill m-1"></i>Trang cá nhân</a></li>
+                    <li><a class="dropdown-item" href="/chats/history/<%= currentUser._id %>"><i class="bi bi-info-circle-fill m-1"></i>Lịch sử tin nhắn</a></li>
                     <li><a class="dropdown-item" href="/account/logout"><i class="bi bi-person-check-fill m-1"></i>Thoát tài khoản</a></li>
                   </ul>
                 </div>
@@ -147,6 +152,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script src="/javascripts/validateForm.js"></script>
     <script>
+      const user_id = `<%= currentUser ? currentUser._id : '' %>`;
+      if(user_id)
+      {
       document.addEventListener('DOMContentLoaded', () => {
           const notificationCountElement = document.getElementById('notification-count');
       
@@ -172,7 +180,86 @@
           // Thiết lập interval để cập nhật mỗi 1 phút (tùy chọn)
           setInterval(fetchUnreadNotificationCount, 60000); // 1 phút
       });
+      }
       </script>
-      
+      <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+        if(user_id)
+        {
+          sender_id = user_id;
+          const socket = io({
+            auth: {
+            token: '<%= currentUser._id%>'
+            }
+          });
+
+          socket.on('userOnline', function(data){
+            let userElement = $(`[data-id='${data}']`);
+            userElement.removeClass('offline-user')
+            userElement.addClass('online-user')
+            userElement.text('Online');
+          })
+          socket.on('userOffline', function(data){
+            let userElement = $(`[data-id='${data}']`);
+            userElement.removeClass('online-user')
+            userElement.addClass('offline-user')
+            userElement.text('Online');
+          })
+
+          $('#chat-form').submit(function(event){
+          event.preventDefault();
+          var message = $('#message').val();
+          $.ajax({
+              url:'/chats/save-chat',
+              type: 'POST',
+              data: {
+                  sender_id: sender_id,
+                  receiver_id: receiver_id,
+                  message: message
+              }
+              ,
+              success:function(response){
+                  if(response.success){
+                      $('#message').val('');
+                      let chat = response.data.message;
+                      let html = `
+                      <div class="chat-message sender">
+                        <div class="message-content">
+                          <h5>`+chat+`</h5>
+                        </div>
+                      </div>
+                      `;
+                      $('#chat-container').append(html);
+                      socket.emit('newChat',response.data);
+                      scrollChat();
+                  }
+                }
+            })
+          })
+
+        //Load new chat receive from others
+          socket.on('loadNewChat', function(data) {
+          if(sender_id == data.receiver_id && receiver_id == data.sender_id){
+              let html = `
+                      <div class="chat-message receiver">
+                        <div class="message-content">
+                          <h5>`+data.message+`</h5>
+                        </div>
+                      </div>
+              `;
+              $('#chat-container').append(html);
+              scrollChat();
+            } 
+        })
+        //Scroll to the bottom of the chat
+        function scrollChat() {
+          $('#chat-container').animate({
+              scrollTop: $('#chat-container').offset().top + $('#chat-container')[0].scrollHeight
+          }, 0);
+        }
+        }  
+        scrollChat();  
+      </script>
   </body>
 </html>

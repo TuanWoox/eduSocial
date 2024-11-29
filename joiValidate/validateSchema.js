@@ -74,3 +74,10 @@ module.exports.userSchema = Joi.object({
         }).optional()  // Make the entire socialLinks object optional
     })
 });
+
+module.exports.ratingSchema = Joi.object({
+    rating: Joi.object({
+        content: Joi.string().required(),
+        rating: Joi.number().integer().required(),
+    }).required()
+})

@@ -14,10 +14,10 @@ const connectFlash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const path = require('path');
-const User = require('./models/User');
 const ejsMate = require('ejs-mate');
 const sanitizeHtml = require('sanitize-html');
 const MongoStore = require('connect-mongo');
+const { createServer} = require('node:http');
 const LocalStrategy = require('passport-local');
 const passportGoogle = require('./passportAuth/passportGoogle');
 const passportGithub = require('./passportAuth/passportGithub');
@@ -25,10 +25,13 @@ const ExpressError = require('./utils/ExpressError');
 const dotenv = require('dotenv');
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/eduSocial';
 
+const User = require('./models/User');
+
 
 
 // Initialize Express
 const app = express();
+const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
 
@@ -97,6 +100,30 @@ passport.use('google',passportGoogle);
 passport.use('github',passportGithub)
 
 
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+
+io.on('connection', async (socket) => {
+  const userId = socket.handshake.auth.token;
+  await User.findByIdAndUpdate({_id: userId}, {$set: {is_online:1}});
+
+  socket.broadcast.emit('userOnline', userId)
+
+  socket.on('newChat', function(data)  {
+    socket.broadcast.emit('loadNewChat', data);
+  })
+  socket.on('disconnect', async function(){
+    const userId = socket.handshake.auth.token;
+    await User.findByIdAndUpdate({_id: userId}, {$set: {is_online:0}});
+    socket.broadcast.emit('userOffline', userId)
+  })
+})
+
+
+
+
+
 // Route imports
 const accountRoutes = require('./routes/account');
 const userRoutes = require('./routes/user');
@@ -108,7 +135,7 @@ const memberRoutes = require('./routes/member')
 const aboutRoutes = require('./routes/about')
 const imageHandlerRoutes = require('./routes/imageHandler');
 const tagRoutes = require('./routes/tag');
-
+const chatRoutes = require('./routes/chat');
 
 //Catch flash message and user!
 app.use((req,res,next) => {
@@ -130,6 +157,7 @@ app.use('/tags', tagRoutes);
 app.use('/notifications',notificationRoutes);
 app.use('/member',memberRoutes);
 app.use('/about',aboutRoutes);
+app.use('/chats', chatRoutes);
 
 app.use('/', (req,res) => {
   res.render('home');
@@ -146,4 +174,4 @@ app.use((err,req,res,next) => {
 })
 
 // Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

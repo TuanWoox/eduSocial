@@ -3,11 +3,12 @@ const router = express.Router({mergeParams: true});
 const CatchAsync = require('../utils/CatchAsync');
 const courseControl = require('../controllers/course');
 const lesssonControl = require('../controllers/lesson');
+const ratingControl = require('../controllers/rating');
 const multer = require('multer');
 const { storage } = require('../cloudinary/postCloud');
 const upload = multer({storage});
-const {isLoggedIn,isAuthorOfCourse} = require('../middleware/checkMiddleware');
-const {validateCourse, validateLesson} = require('../middleware/validateMiddleware');
+const {isLoggedIn,isAuthorOfCourse,isNotAuthorOfTheCourse,isEnrolledInTheCourse,isRatedByCurrentUser,isAuthorOfRating} = require('../middleware/checkMiddleware');
+const {validateCourse, validateLesson,validateRating} = require('../middleware/validateMiddleware');
 router.route('/')
 .get(CatchAsync(courseControl.index))
 
@@ -35,6 +36,11 @@ router.route('/:id/:lessonID')
 .put(isLoggedIn,isAuthorOfCourse,validateLesson,CatchAsync(lesssonControl.updateLesson))
 .delete(isLoggedIn,isAuthorOfCourse,CatchAsync(lesssonControl.deleteLesson))
 
+router.route('/:id/saveRating')
+.post(isLoggedIn,isNotAuthorOfTheCourse,isEnrolledInTheCourse,isRatedByCurrentUser,validateRating,CatchAsync(ratingControl.saveRating));
+
+router.route('/:id/deleteRating/:ratingID')
+.delete(isLoggedIn, isAuthorOfRating, CatchAsync(ratingControl.deleteRating))
 
 router.route('/:id')
 .get(CatchAsync(courseControl.viewACourse))

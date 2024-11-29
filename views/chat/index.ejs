@@ -1,0 +1,36 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="col-md-8">
+    <div class="message-index-section shadow rounded">
+        <!-- Header -->
+        <div class="p-3 border-bottom">
+            <h4 class="mb-0">Messages</h4>
+        </div>
+
+        <!-- Chat List -->
+        <ul class="list-group">
+            <% chatUsers.forEach(user => { %>
+                <li class="list-group-item d-flex align-items-center">
+                    <img 
+                        src="<%= user.profilePic && user.profilePic.url ? user.profilePic.url : '/pictures/user.png' %>"
+                        alt="User Profile" 
+                        class="rounded-circle me-3" 
+                        style="width: 50px; height: 50px;">
+                    <div class="flex-grow-1">
+                        <span class="mb-0 h6"><%= user.name %></span>
+                        <% if(user.is_online === 1) {%>
+                            <span class="online-user small" data-id="<%= user._id %>">Online</span>
+                        <% } else { %>
+                            <span class="offline-user small" data-id="<%= user._id %>">Offline</span>
+                        <% } %>
+                        <% if(user.lastMessage) { %>
+                            <p class="mb-0 text-muted small"><%= user.lastMessage %></p>
+                        <% } else { %>
+                            <p class="mb-0 text-muted small">No messages yet</p>
+                        <% } %>
+                    </div>
+                    <a href="/chats/<%= user._id %>" class="stretched-link"></a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</div>

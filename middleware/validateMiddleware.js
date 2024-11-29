@@ -1,4 +1,4 @@
-const { questionSchema,questionCommentSchema,postSchema,courseSchema, lessonSchema, userSchema } = require('../joiValidate/validateSchema');
+const { questionSchema,questionCommentSchema,postSchema,courseSchema, lessonSchema, userSchema, ratingSchema } = require('../joiValidate/validateSchema');
 const ExpressError = require('../utils/ExpressError');
 const { cloudinary } = require('../cloudinary/postCloud');
 
@@ -100,6 +100,20 @@ module.exports.validateUser = async (req,res,next) => {
                 github,
                 linkedin
             }
+        }
+    })
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        cloudinary.uploader.destroy(req.file.filename);
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+module.exports.validateRating = async(req,res,next) => {
+    const {error} = ratingSchema.validate({
+        rating: {
+            ...req.body
         }
     })
     if (error) {

@@ -110,4 +110,109 @@
   </div>
   </div>
   <% } %>
-
+  <% if(currentUser && !didUserRate && !viewedCourse.author.equals(currentUser._id)) {%>
+  <h3> Để lại bình luận và đánh giá</h3>
+  <form action="/courses/<%= viewedCourse.id %>/saveRating" method="POST">
+    <fieldset class="starability-slot">
+      <legend class="h5">Điểm</legend>
+      <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0" checked aria-label="No rating." />
+      <input type="radio" id="second-rate1" name="rating" value="1" />
+      <label for="second-rate1" title="Terrible">1 star</label>
+      <input type="radio" id="second-rate2" name="rating" value="2" />
+      <label for="second-rate2" title="Not good">2 stars</label>
+      <input type="radio" id="second-rate3" name="rating" value="3" />
+      <label for="second-rate3" title="Average">3 stars</label>
+      <input type="radio" id="second-rate4" name="rating" value="4" />
+      <label for="second-rate4" title="Very good">4 stars</label>
+      <input type="radio" id="second-rate5" name="rating" value="5" />
+      <label for="second-rate5" title="Amazing">5 stars</label>
+    </fieldset>
+    <div class="mb-3 mt-3">
+      <label for="exampleFormControlTextarea1" class="form-label h5">Ý kiến của bạn</label>
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content"></textarea>
+    </div>
+    <button class="btn-info btn-sm btn">Gửi đi đánh giá của bạn</button>
+  </form>
+  <% } %>
+  <% if (ratings.length > 0) { %>
+    <div class="ratings-section">
+      <h3 class="h5">Đánh giá từ người học (<%= averageRating %> / 5 ⭐)</h3>
+      <ul class="list-group">
+        <% ratings.forEach(rating => { %>
+          <li class="list-group-item">
+            <div class="d-flex align-items-start">
+              <!-- Avatar Section -->
+              <div class="me-3">
+                <img src="<%= rating.author.profilePic.url || '/pictures/user.png' %>" 
+                     alt="<%= rating.author.name %>'s Avatar" 
+                     class="rounded-circle" 
+                     style="width: 50px; height: 50px; object-fit: cover;">
+              </div>
+             <!-- Review Content Section -->
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <a href="/users/<%= rating.author._id %>" style="text-decoration: none; color: black;"><%= rating.author.name %></a>
+                  <span class="badge bg-primary"><%= rating.rating %> ⭐</span>
+                </div>
+                <small class="text-muted"><%= new Date(rating.createdAt).toLocaleDateString() %></small>
+              </div>
+              <p class="mt-2 mb-0"><%= rating.content %></p>
+              <% if(currentUser && rating.author.equals(currentUser._id)) {%>
+              <div class="d-flex justify-content-end">
+                <form action="/courses/<%= viewedCourse.id %>/deleteRating/<%= rating._id %>?_method=DELETE" method="POST" class="mb-0">
+                  <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
+                </form>
+              </div>
+              <% } %>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <!-- Previous Button -->
+        <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </span>
+          </li>
+        <% } %>
+    
+        <!-- Page Numbers -->
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+          </li>
+        <% } %>
+    
+        <!-- Next Button -->
+        <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </span>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+    
+  <% } else { %>
+    <p class="text-muted">Chưa có đánh giá nào cho khóa học này.</p>
+  <% } %>
+  
+  

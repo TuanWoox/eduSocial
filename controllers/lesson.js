@@ -71,11 +71,10 @@ module.exports.viewALesson = async (req, res) => {
                     courseId: course._id,
                     lastAccessed: new Date()
                 });
+                course.studentsEnrolled.push(user._id);
+                await course.save();
             }
             await user.save();  // Save the user's updated progress
-            course.studentsEnrolled.push(user._id);
-            course.studentCount +=1;
-            await course.save();
         }
 
         // Render the page with course and lesson info

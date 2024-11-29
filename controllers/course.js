@@ -1,6 +1,7 @@
 const Course = require('../models/course')
 const Lesson = require('../models/lessson');
 const User = require('../models/User');
+const Rating = require('../models/rating');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Tất cả khóa học',
@@ -13,55 +14,91 @@ module.exports.index = async (req, res) => {
     const perPage = 10; // Number of courses per page
     const page = req.query.page || 1; // Default to page 1 if no page query parameter
     const topicSearch = req.query.topicSearch || 'Lập trình'; // Default topic: 'IT & Phần mềm'
-    const sortBy = req.query.sortBy || 'createdAt'; // Default sort: 'createdAt'
-    //thêm
+    const sortBy = req.query.sortBy || 'highestRated'; // Default sort: 'highestRated'
     const searchQuery = req.query.search || ''; // Capture search parameter
 
     // Build filter and sort options
-    let query = { };
-    if (topic) {
+    let query = {};
+    if (topicSearch) {
         query.topic = topicSearch; // Filter by selected topic
     }
     if (searchQuery) {
         query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
     }
 
-    //thêm
-    if (searchQuery) {
-        query.title = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by title
+    // Define the sorting criteria
+    let sortOptions = {};
+    if (sortBy === 'activity') {
+        sortOptions = { updatedAt: -1 }; // Sort by last updated date
+    } else if (sortBy === 'student') {
+        sortOptions = { studentCount: -1 }; // Sort by number of students enrolled
+    } else if (sortBy === 'highestRated') {
+        // Aggregate by average rating for each course and then sort by it
+        const courses = await Course.aggregate([
+            {
+                $match: query // Apply filters (topicSearch, searchQuery)
+            },
+            {
+                $lookup: {
+                    from: 'ratings', // Join with Rating collection
+                    localField: '_id',
+                    foreignField: 'courseRated',
+                    as: 'ratings'
+                }
+            },
+            {
+                $addFields: {
+                    averageRating: {
+                        $avg: "$ratings.rating" // Calculate the average rating for each course
+                    }
+                }
+            },
+            {
+                $sort: { averageRating: -1 } // Sort courses by average rating in descending order
+            },
+            {
+                $skip: (perPage * page) - perPage // Pagination
+            },
+            {
+                $limit: perPage // Limit results to perPage
+            }
+        ]);
+
+        // Get total number of courses for pagination
+        const count = await Course.countDocuments(query);
+        
+        return res.render('courses/index', {
+            topic,
+            topicSearch,
+            sortBy,
+            courses,
+            searchQuery,
+            currentPage: page,
+            totalPages: Math.ceil(count / perPage),
+        });
     }
 
-    // Determine the sorting criteria
-    let sortOptions = {};
-    if (sortBy === 'createdAt') {
-        sortOptions = { createdAt: -1 }; // Sort by creation date, newest first
-    } else if (sortBy === 'activity') {
-        sortOptions = { updatedAt: -1 }; // Sort by last updated date
-    } else if(sortBy === 'student') {
-        sortOptions = { studentCount : -1}
-    }
-    // Get courses with the filtering and sorting applied
-    const courses = await Course.find({topic: topicSearch})
+    // If not sorted by highestRated, just query normally
+    const courses = await Course.find({ topic: topicSearch })
         .skip((perPage * page) - perPage)
         .limit(perPage)
         .sort(sortOptions);
+
     // Get total number of courses for pagination
     const count = await Course.countDocuments(query);
-    // Render the page with courses, topic, and pagination info
-
+    
     res.render('courses/index', {
+        topic,
         topicSearch,
         sortBy,
         courses,
-        topic,
-        //thêm
         searchQuery,
-
         currentPage: page,
         totalPages: Math.ceil(count / perPage),
-        
     });
 };
+
+
 //thêm(tìm kiếm khóa học)
 module.exports.indexSearch = async (req, res) => {
     const perPage = 10; // Số khóa học trên mỗi trang
@@ -108,13 +145,71 @@ module.exports.createCourse = async (req,res) => {
     await newCourse.save();
     res.redirect(`/courses/${newCourse.id}`);
 }
-module.exports.viewACourse = async (req,res) => {
+
+module.exports.viewACourse = async (req, res) => {
+    // Fetch the course details along with lessons and author information
     const viewedCourse = await Course.findById(req.params.id)
-    .populate('lessons', 'title _id')
-    .populate('author', 'name _id own_courses profilePic')
-    const authorNumberOfCourse = await Course.countDocuments({author: viewedCourse.author})
-    res.render('courses/showCourse', {topic, viewedCourse,authorNumberOfCourse });
-}
+        .populate('lessons', 'title _id')
+        .populate('author', 'name _id own_courses profilePic');
+    
+    // Get the total number of courses by the author
+    const authorNumberOfCourse = await Course.countDocuments({ author: viewedCourse.author });
+
+    // Pagination setup
+    const perPage = 10; // Number of ratings per page
+    const page = Math.max(1, parseInt(req.query.page) || 1); // Ensure the page is at least 1
+
+    // Fetch total number of ratings for the course
+    const totalRatings = await Rating.countDocuments({ courseRated: viewedCourse._id });
+    const totalPages = Math.ceil(totalRatings / perPage);
+
+    // Fetch the ratings for the current page
+    const ratings = await Rating.find({ courseRated: viewedCourse._id })
+        .populate('author', 'name _id profilePic')
+        .skip((perPage * (page - 1)))
+        .limit(perPage);
+
+    // Check if the user has already rated the course
+    let didUserRate = false;
+    ratings.forEach((rating) => {
+        if (rating.author.equals(req.user._id)) didUserRate = true;
+    });
+    
+    // Calculate the average rating
+    const ratingStats = await Rating.aggregate([
+        { $match: { courseRated: viewedCourse._id } }, // Filter ratings for the specific course
+        { $group: { 
+            _id: null,
+            sumOfRatings: { $sum: "$rating" },  // Sum of all ratings
+            totalRatings: { $sum: 1 }  // Total count of ratings
+        }}
+    ]);
+
+    // If ratings exist, calculate the average
+    let averageRating = 0;
+    if (ratingStats.length > 0) {
+        const sumOfRatings = ratingStats[0].sumOfRatings;
+        const totalRatingsCount = ratingStats[0].totalRatings;
+        averageRating = sumOfRatings / totalRatingsCount;
+    }
+
+    // Round the average to one decimal place (optional)
+    averageRating = Math.round(averageRating * 10) / 10;
+
+    // Render the course page with the average rating and other data
+    res.render('courses/showCourse', {
+        topic,
+        viewedCourse,
+        authorNumberOfCourse,
+        ratings,
+        didUserRate,
+        currentPage: page,
+        totalPages,
+        averageRating  // Pass averageRating to the view
+    });
+};
+
+
 module.exports.viewEditCourseInfoForm = async (req,res) => {
     const id = req.params.id;
     const course = await Course.findById(id);
@@ -166,6 +261,6 @@ module.exports.deleteCourse = async (req,res) => {
         // Save the updated user document
         await user.save();
     }
+    const deltedRating = await Rating.deleteMany({courseRated: id});
     res.redirect('/courses');
 }
-
