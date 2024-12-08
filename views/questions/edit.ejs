@@ -55,7 +55,7 @@
     // Fetch tags immediately when the page loads
     async function fetchInitialTags() {
         try {
-            const response = await fetch('http://localhost:5000/tags/suggest?letter=');
+            const response = await fetch('/tags/suggest?letter=');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const arrayTags = await response.json();
@@ -78,7 +78,7 @@
 
         if (query.length > 0) {
             try {
-                const response = await fetch(`http://localhost:5000/tags/suggest?letter=${query}`);
+                const response = await fetch(`/tags/suggest?letter=${query}`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const arrayTags = await response.json();

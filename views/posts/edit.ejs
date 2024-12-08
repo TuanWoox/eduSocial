@@ -12,7 +12,7 @@
         <div class="mb-3">                        
             <label for="tags" class="form-label"><h5>Tags (cách nhau bằng dấu space)</h5></label>
             <input type="text" class="form-control" id="tags" name="post[tags]" required 
-                value='<%= JSON.stringify(question.tags.map(tag => tag.name)) %>'>
+                value='<%= JSON.stringify(post.tags.map(tag => tag.name)) %>'>
         </div>         
         <div class="mb-3">             
             <label for="content" class="form-label"><h5>Nội dung post</h5></label>             
@@ -131,7 +131,7 @@
     // Fetch tags immediately when the page loads
     async function fetchInitialTags() {
         try {
-            const response = await fetch('http://localhost:5000/tags/suggest?letter=');
+            const response = await fetch('/tags/suggest?letter=');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const arrayTags = await response.json();
@@ -154,7 +154,7 @@
 
         if (query.length > 0) {
             try {
-                const response = await fetch(`http://localhost:5000/tags/suggest?letter=${query}`);
+                const response = await fetch(`/tags/suggest?letter=${query}`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const arrayTags = await response.json();
