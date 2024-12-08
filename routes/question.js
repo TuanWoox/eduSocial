@@ -31,6 +31,11 @@ router.route('/:id/:commentID')
 .put(isLoggedIn,isAuthorOfQuestionComment,validateQuestionComment,CatchAsync(questionComment.editAnswer))
 .delete(isLoggedIn,isAuthorOfQuestionComment,CatchAsync(questionComment.deleteAnswer))
 
+router.route('/:id/likeQuestion')
+.post(isLoggedIn,questionControl.likeQuestion)
+
+router.route('/:id/unlikeQuestion')
+.post(isLoggedIn,questionControl.unLikeQuestion)
 
 router.route('/:id')
 .get(questionControl.viewQuestion)

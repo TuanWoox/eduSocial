@@ -22,9 +22,11 @@
                 
 
             </div>
-            <p class="mb-0">Views <strong><%= question.views  %></strong></p>
+            <p class="mb-0">Views: <strong><%= question.views  %></strong></p>
+            <p class="mb-0">Lượt thích: <strong id="numberOfLikes"><%= question.isLiked.length  %></strong></p>
+
             <!-- Tags -->
-            <div class="my-3">
+            <div class="my-2">
                 <h6>Tags:</h6>
                 <% question.tags.forEach(tag => { %>
                     <a href="/tags/questionsTagged/<%= tag._id %>" class="badge bg-info me-1 text-decoration-none text-white">
@@ -38,6 +40,13 @@
                 <p class="lead mb-0" style="font-size: 1.2rem; line-height: 1.8;">
                     <%= question.body %>
                 </p>
+            </div>
+            <div class="my-2">
+                <% if(!isLikedByUser){ %>
+                <a href="/questions/<%=question._id%>/likeQuestion" class="btn btn-sm btn-info" id="upvoteButton">Like</a>
+                <% } else { %>
+                <a href="/questions/<%=question._id%>/unlikeQuestion" class="btn btn-sm btn-danger" id="upvoteButton">Unlike</a>
+                <% } %>
             </div>
         </div>
     </div>
@@ -208,5 +217,43 @@
         document.getElementById('replyTo').value = '';
         document.getElementById('replyLabel').style.display = 'none';
     }
+
+    document.querySelector('#upvoteButton').addEventListener('click', async (evt) => {
+    const questionID = '<%= question._id %>';
+    let numberOfLikes = document.querySelector('#numberOfLikes');
+    evt.preventDefault();
+
+    const action = evt.target.text === 'Like' ? 'likeQuestion' : 'unlikeQuestion';
+    const url = `/questions/${questionID}/${action}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST', // or 'PUT', depending on your server setup
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            // Toggle UI state on success
+            if (evt.target.text === 'Like') {
+                evt.target.text = 'Unlike';
+                evt.target.classList.remove('btn-info');
+                evt.target.classList.add('btn-danger');
+                numberOfLikes.textContent = parseInt(numberOfLikes.textContent) + 1;
+            } else {
+                evt.target.text = 'Like';
+                evt.target.classList.remove('btn-danger');
+                evt.target.classList.add('btn-info');
+                numberOfLikes.textContent = parseInt(numberOfLikes.textContent) - 1;
+            }
+        } else {
+            console.error('Failed to update like status');
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+});
+
 </script>
 

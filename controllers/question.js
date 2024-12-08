@@ -1,7 +1,9 @@
 const Question = require('../models/question');
 const Comment = require('../models/comment');
+const User = require('../models/User');
 const Tag = require('../models/tag');
 const { json } = require('express');
+const question = require('../models/question');
 const topic = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -39,12 +41,20 @@ module.exports.index = async (req, res) => {
     // Get the total count of questions for pagination
     const totalQuestion = await Question.countDocuments();
     const totalPages = Math.ceil(totalQuestion / questionsPerPage);
-
+    
 
     //fetch the tag
     const response = await fetch('http://localhost:5000/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
  
+
+    // Fetch and add totalComments for each question
+    for (const question of questions) {
+        const totalComments = await Comment.countDocuments({ commentedOnQuestion: question._id });
+        question.totalComments = totalComments;  // Adding totalComments field
+    }
+
+
     res.render('questions/index', {
         topic,
         questions,
@@ -89,7 +99,11 @@ module.exports.Search = async (req, res) => {
         });
 
         const totalPages = Math.ceil(count / questionsPerPage); // Total pages for the search result
-
+        // Fetch and add totalComments for each question
+        for (const question of questions) {
+            const totalComments = await Comment.countDocuments({ commentedOnQuestion: question._id });
+            question.totalComments = totalComments;  // Adding totalComments field
+        }
         res.render('questions/search', {
             topic,
             questions,
@@ -198,13 +212,15 @@ module.exports.viewQuestion = async (req, res) => {
     const totalPages = Math.ceil(totalComments / commentsPerPage);
     question.views += 1;
     await question.save();
+    const isLikedByUser = question.isLiked.includes(req.user._id);
     res.render('questions/show', {
         topic,
         question,
         comments,
         currentPage: page,
         totalPages,
-        totalComments
+        totalComments,
+        isLikedByUser
     });
 };
 module.exports.editQuestion = async (req, res) => {
@@ -261,4 +277,16 @@ module.exports.deleteQuestion = async (req,res) => {
     await Question.findByIdAndDelete(req.params.id)
     req.flash('success', 'Xóa câu hỏi thành công!!!');
     res.redirect('/questions');
+}
+module.exports.likeQuestion = async (req,res) => {
+    const question = await Question.findById(req.params.id);
+    question.isLiked.push(req.user._id);
+    await question.save();
+    res.status(200).json({ status: "ok" });
+}
+module.exports.unLikeQuestion = async (req,res) => {
+    const question = await Question.findById(req.params.id);
+    question.isLiked.pull(req.user._id);
+    await question.save();
+    res.status(200).json({ status: "ok" });
 }

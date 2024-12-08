@@ -25,7 +25,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="tags" class="form-label">Tags (cách nhau bằng dấu space)</label>
+            <label for="tags" class="form-label">Tags (cách nhau bằng dấu tab)</label>
             <input type="text" class="form-control" id="tags" name="question[tags]" required 
                 value='<%= JSON.stringify(question.tags.map(tag => tag.name)) %>'>
             <div class="valid-feedback">

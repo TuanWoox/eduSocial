@@ -20,27 +20,23 @@ const questionSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'Tag',
     }],
-    upvotes: {
-      type: Number,
-      default: 0
-    },
     downvotes: {
       type: Number,
       default: 0
-    },
-    isPublished: {
-      type: Boolean,
-      default: true
     },
     //lưu comment
     comments: [{
       type: Schema.Types.ObjectId,
       ref: 'QuestionComment'  
-  }],
+    }],
     views : {
         type: Number,
         default: 0
     },
+    isLiked: [{
+       type: Schema.Types.ObjectId,
+       ref: 'User'
+    }]
 },
     {timestamps: true}
 );
