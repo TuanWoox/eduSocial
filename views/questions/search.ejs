@@ -1,0 +1,85 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<div class="container mt-4">
+    <form action="/questions/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm câu hỏi" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+
+    <div class="getback">
+        <a href="/questions/" class="btn btn-sm btn-info"><-- Trở về Danh sách Câu hỏi</a>
+    </div>
+    <div class="row">
+         <!-- Question List -->
+         <% if (questions && questions.length > 0) { %>
+            <div class="post-container d-flex flex-column align-items-start">
+                <% questions.forEach(question => { %>
+                    <div class="card mx-3 my-3" style="width: 98%;">
+                        <div class="card-body">
+                            <!-- Question User and Content -->
+                            <div class="d-flex align-items-start">
+                                <div class="user-content me-3">
+                                    <img src="<%= question.author.profilePic && question.author.profilePic.url ? question.author.profilePic.url : '/pictures/user.png' %>" 
+                                    class="img-fluid rounded-circle" 
+                                    style="width: 50px; height: 50px; object-fit: cover;">
+                                </div>
+                                <div class="nd">
+                                    
+                                    <a href="/questions/<%= question._id %>" class="text-decoration-none">
+                                        <h5 class="card-title text-primary"><%= question.title %></h5>
+                                    </a>
+                                    <small class="text-muted">
+                                        <strong>Đăng bởi:</strong> <%= question.author.name %> vào <%= new Date(question.createdAt).toLocaleDateString() %> <%= new Date(question.createdAt).toLocaleTimeString() %>
+                                    </small>
+                                    <!-- Tags Section -->
+                                    <div class="mt-3">
+                                        <strong>Tags:</strong>
+                                        <% question.tags.forEach(tag => { %>
+                                            <a href="/tags/questionsTagged/<%= tag._id %>" class="badge bg-secondary text-decoration-none me-1"><%= tag.name %></a>
+                                        <% }) %>
+                                    </div>
+                                    <div class="d-flex justify-content-start mt-2">
+                                        <span class="me-3"><i class="bi bi-hand-thumbs-up-fill"></i> <%= question.isLiked.length %></span>
+                                        <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= question.totalComments  %> </span>
+                                        <span><i class="bi bi-eye-fill"></i> <%= question.views %></span>
+                                    </div>
+            
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <h2 class="text-center">Hiện chưa có câu hỏi nào!</h2>
+        <% } %>
+
+        <div class="d-flex justify-content-center">
+            <% if (totalPages > 1) { %>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?searchQuery=<%= searchQuery %>&page=<%= currentPage - 1 %>&sort=<%= sort %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="?searchQuery=<%= searchQuery %>&page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?searchQuery=<%= searchQuery %>&page=<%= currentPage + 1 %>&sort=<%= sort %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            <% } %>
+        </div>
+        </div>
+    </div>
+</div>

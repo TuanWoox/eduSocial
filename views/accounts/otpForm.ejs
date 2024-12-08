@@ -1,0 +1,29 @@
+<% layout('layouts/whitelayout') -%>
+
+<header class="text-center">
+  <nav class="navbar navbar-light bg-light py-3 shadow-sm">
+    <a class="navbar-brand fw-bold text-primary" href="#">Ứng dụng OTP</a>
+  </nav>
+</header>
+
+<div class="container d-flex justify-content-center mt-5">
+  <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+    <div class="card-body">
+      <h4 class="text-center mb-4">Xác nhận mã OTP</h4>
+      
+      <form action="/account/verify-otp" method="POST">
+        <input type="hidden" name="username" value="<%= username %>" />
+        
+        <div class="mb-3">
+          <label for="otp" class="form-label">Nhập mã OTP</label>
+          <input type="text" id="otp" name="otp" class="form-control" placeholder="Nhập mã OTP" required />
+        </div>
+        
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Xác nhận</button>
+      </form>
+      
+      <p class="text-center text-muted mt-3">Nếu bạn không nhận được mã, vui lòng kiểm tra lại email của mình.</p>
+    </div>
+  </div>
+</div>
+

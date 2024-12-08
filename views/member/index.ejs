@@ -1,0 +1,103 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<style>
+    .team-member {
+            background-color: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .team-member img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+
+        .team-member h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .team-member p {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #6c757d;
+        }
+
+        .team-member .bi {
+            font-size: 1.5rem;
+            color: #007bff;
+            margin: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .team-member .bi:hover {
+            color: #0056b3;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-top: 1rem;
+        }
+</style>
+
+<!-- Section Header -->
+<div class="section-header">
+    <h2>Đội Ngũ của chúng tôi</h2>
+    <p>Hãy cùng gặp gỡ những người đứng sau EduSocial. Chúng tôi luôn nỗ lực để mang đến trải nghiệm tốt nhất cho bạn!</p>
+</div>
+
+<!-- Team Members -->
+<div class="row justify-content-center">
+    <!-- Member 1 -->
+    <div style="cursor:pointer;" class="col-12 col-md-4 mb-4">
+        <div class="team-member">
+            <img src="/pictures/member1.jpg" alt="Thành viên 1">
+            <h4>Đỗ Đức Anh</h4>
+            <p>CEO & Founder</p>
+            <p>Chuyên gia trong lĩnh vực giáo dục và công nghệ Việt Nam.</p>
+            <div>
+                <a href="#" class="bi bi-facebook"></a>
+                <a href="#" class="bi bi-twitter"></a>
+                <a href="#" class="bi bi-linkedin"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member 2 -->
+    <div style="cursor:pointer;" class="col-12 col-md-4 mb-4">
+        <div class="team-member">
+            <img src="/pictures/member2.jpg" alt="Thành viên 2">
+            <h4>Nguyễn Tuấn Vũ</h4>
+            <p>CEO & Founder</p>
+            <p>Chuyên gia trong lĩnh vực giáo dục và công nghệ Việt Nam.</p>
+            <div>
+                <a href="#" class="bi bi-facebook"></a>
+                <a href="#" class="bi bi-twitter"></a>
+                <a href="#" class="bi bi-linkedin"></a>
+            </div>
+        </div>
+    </div>
+</div>

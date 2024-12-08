@@ -1,0 +1,47 @@
+<% layout('layouts/whitelayout') -%>
+
+
+
+<header class="text-center mt-4">
+  <h1 style="color: rgb(72, 221, 171); cursor: pointer; font-size: 24px;">
+    <a href="/" style="text-decoration: none; color: inherit;">EduSocial.com</a>
+  </h1>
+</header>
+
+<div class="container mt-5" style="max-width: 400px; border: 1px solid #ccc; padding: 20px; border-radius: 8px;">
+  <h1 class="text-center">Login</h1>
+  <div id="message"></div>
+
+  <!-- Login Form -->
+  <form id="login-form" action="/account/login" method="post">
+    <div class="mb-3">
+      <input type="text" id="username" name="username" class="form-control" placeholder="Tên tài khoản" required>
+    </div>
+    <div class="mb-3">
+      <input type="password" id="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100" style="font-size: 14px; padding: 8px;">Đăng nhập</button>
+    <p class="mt-3 text-center">
+      Quên tài khoản? <a href="/account/forgotPassword" id="switch-regis">Gửi OTP</a>
+    </p>
+    <p class="mt-3 text-center">
+     Bạn không có tài khoản? <a href="/account/register" id="switch-regis">Đăng kí</a>
+    </p>
+  </form>
+
+  <div class="link-group">
+    <p style="text-align: center;">Đăng nhập với</p>
+    <ul class="list-inline text-center">
+      <li class="list-inline-item">
+        <a href="/account/login/githubAuth">
+          <img style="background-size: cover; background-repeat: no-repeat; width: 60px; height: 40px;" src="/pictures/github.jpg" alt="Facebook">
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <a href="/account/login/googleAuth">
+          <img style="background-size: cover; background-repeat: no-repeat; width: 40px; height: 40px;" src="/pictures/google.jpg" alt="Google">
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<% layout('layouts/whitelayout') -%>
+<header class="text-center mt-4">
+    <h1 style="color: rgb(72, 221, 171); cursor: pointer; font-size: 24px;">
+      <a href="/" style="text-decoration: none; color: inherit;">EduSocial.com</a>
+    </h1>
+  </header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4>Đăng kí</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/account/register" method="POST">
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Email của bạn</label>
+                            <input type="email" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="mb-3">
+                            <label for="dateOfBirth" class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-outline-primary">Đăng ký</button>
+                            Đã có tài khoản:<a href="/account/login" class="btn btn-outline-success">Đăng nhập</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

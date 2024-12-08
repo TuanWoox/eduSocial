@@ -1,0 +1,13 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<div class="notifications">
+    <% notifications.forEach(notification => { %>
+        <div class="notification <%= notification.isRead ? '' : 'unread' %>">
+            <p>
+                <strong><%= notification.sender.name %></strong>
+                <%= notification.message %>
+            </p>
+            <small><%= notification.createdAt.toLocaleString() %></small>
+        </div>
+    <% }); %>
+</div>

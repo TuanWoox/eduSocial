@@ -1,0 +1,49 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="col-md-8">
+    <div class="chat-section shadow rounded">
+        <!-- User Info Section -->
+        <div class="d-flex align-items-center p-3 border-bottom">
+            <img 
+                src="<%= receiver.profilePic && receiver.profilePic.url ?  receiver.profilePic.url : '/pictures/user.png' %>"
+                alt="User Profile" 
+                class="rounded-circle me-3" 
+                style="width: 50px; height: 50px;">
+            <div>
+                <h6 class="mb-0"><%= receiver.name %></h6>
+                <% if(receiver.is_online === 1){ %>
+                    <p  class="mb-0 online-user small" data-id="<%= receiver._id  %>">Online</p>
+                <% } else { %>
+                    <p class="mb-0 offline-user small" data-id="<%= receiver._id  %>"="">Offline</p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat-container" class="p-3 rounded">
+            <% chats.forEach(chat => { %>
+                <div class="chat-message 
+                    <%= chat.sender_id == currentUser._id.toString() ? 'sender' : 'receiver' %>">
+                    <div class="message-content">
+                        <h5><%= chat.message %></h5>
+                    </div>
+                </div>                
+            <% }); %>
+        </div>
+
+        <!-- Message Input Form -->
+        <form action="" id="chat-form" class="d-flex mt-3">
+            <input 
+                type="text" 
+                name="message" 
+                placeholder="Nhập vào tin nhắn của bạn" 
+                id="message" 
+                required 
+                class="form-control me-2 border rounded">
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+<a href="/chats/history/<%= currentUser._id %>" class="btn btn-sm btn-primary mt-2" style="width: 40%;">Trở về lịch sử trò chuyện</a>
+<script>
+    const receiver_id = `<%= receiver._id %>`;
+</script>

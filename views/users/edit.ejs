@@ -1,0 +1,50 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<form action="/users/<%= user._id  %>/edit" method="POST" enctype="multipart/form-data" class="validated-form" novalidate>
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="user[name]" class="form-control" value="<%= user.name %>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="dateOfBirth">Date of Birth</label>
+    <input type="date" id="dateOfBirth" name="user[dateOfBirth]" class="form-control" value="<%= user.dateOfBirth ? user.dateOfBirth.toISOString().split('T')[0] : '' %>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="bio">Bio</label>
+    <textarea id="bio" name="user[bio]" class="form-control" required><%= user.bio %></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="facebook">Facebook Link</label>
+    <input type="url" id="facebook" name="user[facebook]" class="form-control" value="<%= user.socialLinks.facebook %>">
+  </div>
+
+  <div class="form-group">
+    <label for="github">GitHub Link</label>
+    <input type="url" id="github" name="user[github]" class="form-control" value="<%= user.socialLinks.github %>">
+  </div>
+
+  <div class="form-group">
+    <label for="linkedin">LinkedIn Link</label>
+    <input type="url" id="linkedin" name="user[linkedin]" class="form-control" value="<%= user.socialLinks.linkedin %>">
+  </div>
+
+  <!-- Current Thumbnail Preview -->
+  <% if (user.profilePic && user.profilePic.url) { %>
+    <div class="mb-2">
+      <img src="<%= user.profilePic.url %>"  class="img-thumbnail" style="max-width: 200px;">
+    </div>
+  <% } else {%>
+
+  <div class="form-group">
+    <label for="profilePic">Profile Picture</label>
+    <input type="file" id="profilePic" name="profilePic" class="form-control-file">
+  </div>
+  <% } %>
+
+  <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+</form>
+
+<a href="/profile" class="btn btn-info mt-3" style="width: 20%;">Back to Profile</a>

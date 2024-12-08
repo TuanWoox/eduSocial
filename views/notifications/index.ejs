@@ -1,0 +1,42 @@
+<% layout('layouts/indexboilerplate') -%>
+<div class="container mt-4">
+    <% if (notifications.length === 0) { %>
+        <p class="text-center">Bạn chưa có thông báo nào.</p>
+    <% } else { %>
+        <div class="list-group">
+            <% notifications.forEach(notification => { %>
+                <div class="list-group-item <%= notification.isRead ? '' : 'bg-light' %>">
+                    <p>
+                        <%= notification.message %>
+                    </p>
+                    <% if (notification.post) { %>
+                        <a href="/posts/<%= notification.post._id %>" class="btn btn-link">Xem bài viết</a>
+                    <% } else if (notification.question) { %>
+                        <a href="/questions/<%= notification.question._id %>" class="btn btn-link">Xem câu hỏi</a>
+                    <% } %>
+                    <small class="text-muted d-block"><%= new Date(notification.createdAt).toLocaleString() %></small>
+                    <% if (!notification.isRead) { %>
+                        <button class="btn btn-sm btn-primary mt-2" onclick="markAsRead('<%= notification._id %>')">Đánh dấu là đã đọc</button>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    async function markAsRead(id) {
+        console.log(id);
+        try {
+            const response = await fetch(`/notifications/${id}/read`, { method: 'PATCH' });
+            console.log(response);
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Không thể đánh dấu thông báo là đã đọc');
+            }
+        } catch (error) {
+            console.error('Đã xảy ra lỗi:', error);
+        }
+    }
+</script>

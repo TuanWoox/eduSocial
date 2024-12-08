@@ -1,0 +1,135 @@
+<% layout('layouts/indexboilerplate') -%>
+
+<div class="container mt-4">
+    <form action="/questions/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm câu hỏi" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+    <div class="row">
+        <!-- Main Content (Left Side) -->
+        <div class="col-lg-8 main-left">
+            <!-- Navbar for Sorting -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light p-3 rounded mb-4">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <button class="btn btn-outline-primary active me-2">Câu Hỏi</button>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <p class="mb-0 me-2">Sắp Xếp:</p>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <% if(sort === 'newest') { %>Mới nhất<% } %>
+                            <% if(sort === 'activity') { %>Hoạt động<% } %>
+                            <% if(sort === 'views') { %>Lượt xem<% } %>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="?page=<%= currentPage %>&sort=newest" class="dropdown-item">Mới Nhất</a></li>
+                            <li><a href="?page=<%= currentPage %>&sort=activity" class="dropdown-item">Hoạt động</a></li>
+                            <li><a href="?page=<%= currentPage %>&sort=views" class="dropdown-item">Lượt xem</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!-- Question List -->
+            <% if (questions && questions.length > 0) { %>
+                <div class="post-container d-flex flex-column align-items-start">
+                    <% questions.forEach(question => { %>
+                        <div class="card mx-3 my-3" style="width: 98%;">
+                            <div class="card-body">
+                                <!-- Question User and Content -->
+                                <div class="d-flex align-items-start">
+                                    <div class="user-content me-3">
+                                        <img src="<%= question.author.profilePic && question.author.profilePic.url ? question.author.profilePic.url : '/pictures/user.png' %>" 
+                                        class="img-fluid rounded-circle" 
+                                        style="width: 50px; height: 50px; object-fit: cover;">
+                                    </div>
+                                    <div class="nd">
+                                        <a href="/questions/<%= question._id %>" class="text-decoration-none">
+                                            <h5 class="card-title text-primary"><%= question.title %></h5>
+                                        </a>
+                                        <small class="text-muted">
+                                            <strong>Đăng bởi:</strong> <%= question.author.name %> vào <%= new Date(question.createdAt).toLocaleDateString() %> <%= new Date(question.createdAt).toLocaleTimeString() %>
+                                        </small>
+                                        <div class="mt-3">
+                                            <strong>Tags:</strong>
+                                            <% question.tags.forEach(tag => { %>
+                                                <a href="/tags/questionsTagged/<%= tag._id %>" class="badge bg-secondary text-decoration-none me-1"><%= tag.name %></a>
+                                            <% }) %>
+                                        </div>
+                                        <div class="d-flex justify-content-start mt-2">
+                                            <span class="me-3"><i class="bi bi-hand-thumbs-up-fill"></i> <%= question.upvotes - question.downvotes %></span>
+                                            <span class="me-3"><i class="bi bi-pencil-fill"></i> </span>
+                                            <span><i class="bi bi-eye-fill"></i> <%= question.views %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <h2 class="text-center">Hiện chưa có câu hỏi nào!</h2>
+            <% } %>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                <% if (totalPages > 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                                <a class="page-link" href="?page=1&sort=<%= sort %>">1</a>
+                            </li>
+                            <% if (currentPage > 4) { %>
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <% } %>
+                            <% for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>&sort=<%= sort %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <% if (currentPage < totalPages - 3) { %>
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <% } %>
+                            <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= totalPages %>&sort=<%= sort %>"><%= totalPages %></a>
+                            </li>
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            </div>
+        </div>
+         <!-- Sidebar (Right Side) -->
+         <div class="col-lg-4 main-right">
+            <!-- Popular Tags Section -->
+            <div class="common-tag bg-light p-4 rounded mb-4 shadow-sm">
+                <h3 class="text-info mb-3">Tag Phổ biến</h3>
+                <div id="popular-tags-list">
+                    <!-- Loop through the popularTags array and display each tag -->
+                    <% popularTags.forEach(tag => { %>
+                        <div class="tag-item d-flex justify-content-between align-items-center mb-3">
+                            <p class="mb-0" style="color: red;"><%= tag.name %></p>
+                            <p class="mb-0"><a href="/tags/questionsTagged/<%= tag._id %>" style="text-decoration: none;">x<%= tag.numberOfQuestions %></a></p>
+                        </div>
+                    <% }) %>
+                </div>
+                <div class="morebtn text-end">
+                    <a href="/tags?page=1&sort=numberOfPostsAndQuestions" class="text-decoration-none text-primary">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

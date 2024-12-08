@@ -1,0 +1,55 @@
+<!-- views/posts/search.ejs -->
+<% layout('layouts/indexboilerplate') -%>
+
+<div class="container mt-4">
+    <form action="/posts/search" method="get" class="input-group mb-3">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm bài viết" aria-label="Tìm kiếm" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+    
+    <div class="getback">
+        <a href="/posts/"><-- Trở về Danh sách Bài Viết</a>
+    </div>
+
+    <% if (posts && posts.length > 0) { %>
+        <div class="post-container d-flex flex-column align-items-start">
+            <% posts.forEach(post => { %>
+                <div class="card mx-3 my-3" style="width: 98%;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <div class="user-content me-3">
+                                <img src="<%= post.author.profilePic.url || '/pictures/user.png' %>" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                            </div>
+                            <div class="nd">
+                                <a href="/posts/<%= post._id %>" class="text-decoration-none">
+                                    <h5 class="card-title text-primary"><%= post.title %></h5>
+                                </a>
+                                <small class="text-muted"> <strong>Đăng bởi:</strong> <%= post.author.name %> vào <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></small>
+                                <div class="d-flex justify-content-start mt-2">
+                                    <a class="card-link btn btn-success btn-sm me-2" href="/posts/<%= post._id %>">Xem chi tiết</a>
+                                    <span class="me-3"><i class="bi bi-star-fill text-warning"></i> <%= post.upvotes - post.downvotes %></span>
+                                    <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= post.comments.length %></span>
+                                    <span><i class="bi bi-eye-fill"></i> <%= post.views %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <h2 class="text-center">Không tìm thấy bài viết nào phù hợp!</h2>
+    <% } %>
+
+    <div class="d-flex justify-content-center">
+        <% if (totalPages > 1) { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- Pagination code remains as it is -->
+                </ul>
+            </nav>
+        <% } %>
+    </div>       
+</div>
