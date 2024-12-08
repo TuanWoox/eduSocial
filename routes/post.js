@@ -33,6 +33,12 @@ router.route('/:id/:commentID')
 router.route('/:id/edit')
 .get(isLoggedIn,isAuthorOfPost,CatchAsync(postController.viewEdit));
 
+router.route('/:id/likePost')
+.post(isLoggedIn,postController.likePost)
+
+router.route('/:id/unlikePost')
+.post(isLoggedIn,postController.unlikePost)
+
 // Route để lấy bài viết cụ thể và cập nhật
 router.route('/:id')
 .get(CatchAsync(postController.viewAPost))

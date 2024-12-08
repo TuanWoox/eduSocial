@@ -44,7 +44,11 @@ const postSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    isLiked: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+     }]
 }, {timestamps: true});
 
 postSchema.post('findOneAndDelete', async function(post) {

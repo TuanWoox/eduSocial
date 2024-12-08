@@ -154,7 +154,7 @@
     <script src="/javascripts/validateForm.js"></script>
     <script>
       const user_id = `<%= currentUser ? currentUser._id : '' %>`;
-      if(user_id)
+      if(user_id != '')
       {
       document.addEventListener('DOMContentLoaded', () => {
           const notificationCountElement = document.getElementById('notification-count');
@@ -186,7 +186,7 @@
       <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
       <script src="/socket.io/socket.io.js"></script>
       <script>
-        if(user_id)
+        if(user_id != '')
         {
           sender_id = user_id;
           const socket = io({

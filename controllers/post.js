@@ -198,14 +198,15 @@ module.exports.viewAPost = async (req, res) => {
 
     post.views += 1; 
     await post.save();
-
+    const isLikedByUser = post.isLiked.includes(req.user._id);
     res.render('posts/show', {
         topic,
         post, 
         comments,
         currentPage: page,
         totalPages,
-        totalComments
+        totalComments,
+        isLikedByUser
     });
 };
 
@@ -312,4 +313,16 @@ module.exports.uploadTinyMCE = async (req, res) => {
 module.exports.deleteTinyMCE = async (req,res) => {
     const filename = decodeURIComponent(req.params.filename)
     await cloudinary.uploader.destroy(filename);
+}
+module.exports.likePost = async (req,res) => {
+    const post = await Post.findById(req.params.id);
+    post.isLiked.push(req.user._id);
+    await post.save();
+    res.status(200).json({ status: "ok" });
+}
+module.exports.unlikePost = async (req,res) => {
+    const post = await Post.findById(req.params.id);
+    post.isLiked.pull(req.user._id);
+    await post.save();
+    res.status(200).json({ status: "ok" });
 }

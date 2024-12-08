@@ -55,6 +55,13 @@
             <%- post.content %>
         </p>
     </div>
+    <div class="my-2">
+        <% if(!isLikedByUser){ %>
+        <a href="/posts/<%=post._id%>/likePost" class="btn btn-sm btn-info" id="upvoteButton">Like</a>
+        <% } else { %>
+        <a href="/posts/<%=post._id%>/unlikePost" class="btn btn-sm btn-danger" id="upvoteButton">Unlike</a>
+        <% } %>
+    </div>
 </div>
 </div>
 
@@ -214,4 +221,40 @@
         document.getElementById('replyTo').value = '';
         document.getElementById('replyLabel').style.display = 'none';
     }
+    document.querySelector('#upvoteButton').addEventListener('click', async (evt) => {
+    const postID = '<%= post._id %>';
+    let numberOfLikes = document.querySelector('#numberOfLikes');
+    evt.preventDefault();
+
+    const action = evt.target.text === 'Like' ? 'likePost' : 'unlikePost';
+    const url = `/posts/${postID}/${action}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST', // or 'PUT', depending on your server setup
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            // Toggle UI state on success
+            if (evt.target.text === 'Like') {
+                evt.target.text = 'Unlike';
+                evt.target.classList.remove('btn-info');
+                evt.target.classList.add('btn-danger');
+                numberOfLikes.textContent = parseInt(numberOfLikes.textContent) + 1;
+            } else {
+                evt.target.text = 'Like';
+                evt.target.classList.remove('btn-danger');
+                evt.target.classList.add('btn-info');
+                numberOfLikes.textContent = parseInt(numberOfLikes.textContent) - 1;
+            }
+        } else {
+            console.error('Failed to update like status');
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+});
 </script>
