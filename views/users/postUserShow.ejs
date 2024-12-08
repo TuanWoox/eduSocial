@@ -34,14 +34,14 @@
             <% } %>
 
             <!-- Post List -->
-            <% if (post && post.length > 0) { %>
+            <% if (posts && posts.length > 0) { %>
                 <div class="post-container d-flex flex-column align-items-start">
-                    <% post.forEach(post => { %>
-                        <div class="card mx-3 my-3 shadow-sm container-fluid" style="border: 2px solid black;">
+                    <% posts.forEach(post => { %>
+                        <div class="card mx-3 my-3" style="width: 98%;">
                             <div class="card-body">
                                 <!-- Post User and Content -->
-                                <div class="d-flex flex-column flex-sm-row align-items-start">
-                                    <div class="user-content me-3 mb-3 mb-sm-0">
+                                <div class="d-flex align-items-start">
+                                    <div class="user-content me-3">
                                         <img src="<%= post.author.profilePic.url || '/pictures/user.png' %>" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                                     </div>
                                     <div class="nd">
@@ -49,10 +49,16 @@
                                             <h5 class="card-title text-primary"><%= post.title %></h5>
                                         </a>
                                         <small class="text-muted"> <strong>Đăng bởi:</strong> <%= post.author.name %> vào <%= new Date(post.createdAt).toLocaleDateString() %> <%= new Date(post.createdAt).toLocaleTimeString() %></small>
+                                        <!-- Tags Section -->
+                                        <div class="mt-3">
+                                            <strong>Tags:</strong>
+                                            <% post.tags.forEach(tag => { %>
+                                                <a href="/tags/postsTagged/<%= tag._id %>" class="badge bg-secondary text-decoration-none me-1"><%= tag.name %></a>
+                                            <% }) %>
+                                        </div>
                                         <div class="d-flex justify-content-start mt-2">
-                                            <a class="card-link btn btn-success btn-sm me-2" href="/posts/<%= post._id %>">Xem chi tiết</a>
-                                            <span class="me-3"><i class="bi bi-star-fill text-warning"></i> <%= post.upvotes - post.downvotes %></span>
-                                            <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= post.comments.length %></span>
+                                            <span class="me-3"><i class="bi bi-hand-thumbs-up-fill"></i> <%= post.isLiked.length %></span>
+                                            <span class="me-3"><i class="bi bi-pencil-fill"></i> <%= post.totalComments %></span>
                                             <span><i class="bi bi-eye-fill"></i> <%= post.views %></span>
                                         </div>
                                     </div>
@@ -64,7 +70,6 @@
             <% } else { %>
                 <h2 class="text-center">Hiện chưa có bài post nào!</h2>
             <% } %>
-
             <!-- Pagination -->
             <div class="d-flex justify-content-center">
                 <% if (totalPages > 1) { %>

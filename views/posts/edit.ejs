@@ -1,9 +1,6 @@
 <% layout('layouts/indexboilerplate') -%> 
-<div class="container">
-    <a href="/posts/<%= post._id %>" class="btn btn-primary" style="width: auto;">Back to posts</a>
-</div>
 <div class="container mt-2" style="width: 80%;">     
-    <h2>Edit Your Post</h2>     
+    <h2>Chỉnh sửa bài viết của bạn</h2>     
     <form id="editForm" action="/posts/<%= post._id %>?_method=PUT" method="post" novalidate class="validated-form">         
         <div class="mb-3">             
             <label for="title" class="form-label"><h5>Tiêu đề của bài đăng</h5></label>             
@@ -15,12 +12,17 @@
                 value='<%= JSON.stringify(post.tags.map(tag => tag.name)) %>'>
         </div>         
         <div class="mb-3">             
-            <label for="content" class="form-label"><h5>Nội dung post</h5></label>             
+            <label for="content" class="form-label"><h5>Nội dung bài viết</h5></label>             
             <textarea class="form-control" id="tinymce-content" name="post[content]" rows="5" required><%= post.content %></textarea>         
         </div>    
         <input type="hidden" name="newImages" id="newsImages">
         <input type="hidden" name="deletedImages" id="deletedImages">
-        <button class="btn btn-success" type="submit" id="submit-button">Update </button>
+        <div class="d-flex justify-content-between m-2">
+            <a href="/posts/<%= post._id %>" class="btn btn-info">Hủy cập nhật</a>
+            <button class="btn btn-success" type="submit" id="submit-button">Cập nhật </button>
+        </div>
+        
+
     </form> 
 </div>
 <!-- Script element sourcing TinyMCE -->

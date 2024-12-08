@@ -171,9 +171,13 @@ module.exports.viewACourse = async (req, res) => {
 
     // Check if the user has already rated the course
     let didUserRate = false;
-    ratings.forEach((rating) => {
-        if (rating.author.equals(req.user._id)) didUserRate = true;
-    });
+    if(req.user)
+    {
+        ratings.forEach((rating) => {
+            if (rating.author.equals(req.user._id)) didUserRate = true;
+        });
+    }
+    
     
     // Calculate the average rating
     const ratingStats = await Rating.aggregate([

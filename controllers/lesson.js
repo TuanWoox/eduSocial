@@ -56,7 +56,7 @@ module.exports.viewALesson = async (req, res) => {
         const course = await Course.findById(courseID);
 
         // Check if the user is not the author
-        if (req.user._id && !course.author.equals(req.user._id)) {
+        if (req.user && req.user._id && !course.author.equals(req.user._id)) {
             // Update user progress
             const user = await User.findById(req.user._id);
             // Check if the user has the course progress for the specific courseId

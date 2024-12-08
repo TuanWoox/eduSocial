@@ -58,6 +58,7 @@
             <%- post.content %>
         </p>
     </div>
+    <% if(currentUser){ %>
     <div class="my-2">
         <% if(!isLikedByUser){ %>
         <a href="/posts/<%=post._id%>/likePost" class="btn btn-sm btn-info" id="upvoteButton">Like</a>
@@ -65,6 +66,7 @@
         <a href="/posts/<%=post._id%>/unlikePost" class="btn btn-sm btn-danger" id="upvoteButton">Unlike</a>
         <% } %>
     </div>
+    <% } %>
 </div>
 </div>
 
@@ -208,7 +210,7 @@
             </form>
         </div>
     <% } %> 
-    <a href="/posts/" class="btn btn-outline-primary mb-3"><i class="bi bi-arrow-left-circle"></i> Back to Post List</a>
+    <a href="/posts/" class="btn btn-outline-primary mb-3 mt-3" ><i class="bi bi-arrow-left-circle"></i> Trở lại trang bài viết</a>
 </div>
 
 <script>

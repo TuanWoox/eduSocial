@@ -213,7 +213,11 @@ module.exports.viewQuestion = async (req, res) => {
     const totalPages = Math.ceil(totalComments / commentsPerPage);
     question.views += 1;
     await question.save();
-    const isLikedByUser = question.isLiked.includes(req.user._id);
+    let isLikedByUser = false;
+    if(req.user)
+    {
+        const isLikedByUser = question.isLiked.includes(req.user._id);
+    }
     res.render('questions/show', {
         topic,
         question,

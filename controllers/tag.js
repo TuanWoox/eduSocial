@@ -1,7 +1,7 @@
 const Tag = require('../models/tag');
 const Question = require('../models/question');
 const Post = require('../models/Post');
-
+const Comment = require('../models/comment');
 const topicQuestion = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -157,6 +157,13 @@ module.exports.indexQuestionsTagsById = async (req, res) => {
         //fetch the tag
         const response = await fetch('http://localhost:5000/tags/popularTags');
         const popularTags = await response.json();  // Corrected the method to .json()
+        console.log('hehehe');
+        // Fetch and add totalComments for each question
+        for (const question of questions) {
+            const totalComments = await Comment.countDocuments({ commentedOnQuestion: question._id });
+            question.totalComments = totalComments;  // Adding totalComments field
+        }
+        console.log('huhu');
 
         // Render the page with the questions, the tag name, and pagination data
         res.render('tags/searchQuestion', {
@@ -206,7 +213,7 @@ module.exports.indexPostsTagsById = async (req, res) => {
         const skip = (page - 1) * perPage;
 
         // Retrieve the posts, filtering by the tag ID and populating necessary fields
-        const post = await Post.find({ tags: tag._id })
+        const posts = await Post.find({ tags: tag._id })
             .skip(skip)
             .limit(perPage)
             .sort(sortOption)
@@ -221,10 +228,15 @@ module.exports.indexPostsTagsById = async (req, res) => {
         //fetch the tag
         const response = await fetch('http://localhost:5000/tags/popularTags');
         const popularTags = await response.json();  // Corrected the method to .json()
-
+        // Fetch and add totalComments for each question
+        for (const post of posts) {
+            const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
+            post.totalComments = totalComments;  // Adding totalComments field
+            console.log(post);
+        }
         // Render the page with the posts, the tag name, and pagination data
         res.render('tags/searchPost', {
-            post,
+            posts,
             tagName: tag.name,
             currentPage: parseInt(page),
             totalPages,

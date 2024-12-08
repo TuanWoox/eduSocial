@@ -19,22 +19,9 @@
                     <a href="#" class="navbar-brand"><i class="fa-solid fa-earth-europe"></i> EduSocial</a>
                 </div>
                 <ul id="ds-head" class="nav navbar-nav">
-                    <li class="active"><a href="#">Giới thiệu</a></li>
-                    <li><a href="/courses">Khóa học</a></li>
-                    <li><a href="#">Người sáng lập</a></li>
-                    <li><a href="#">Hỏi đáp</a></li>
-                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="/about">Giới thiệu</a></li>
+                    <li><a href="/member">Người sáng lập</a></li>
                 </ul>
-                <form action="" class="navbar-form navbar-left">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="search">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
                 <% if (currentUser) { %>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
@@ -75,10 +62,8 @@
             <div class="header-right">
                 <div class="circle-outer">
                     <div style="transform: translate(-50%, -10%);" class="circle-item"><a href="/questions">Hỏi Đáp</a></div>
-                    <div style="transform: translate(400%, 150%);" class="circle-item">Phản Hồi</div>
                     <div class="circle-middle">
                         <div style="transform: translate(30%, -160%);" class="circle-item"><a href="/posts">Bài Viết</a></div>
-                        <div style="transform: translate(-160%, 30%);" class="circle-item">Tài trợ</div>
                         <div class="circle-inner">
                             <div class="circle-item"><a href="/courses">Học ngay</a></div>
                         </div>

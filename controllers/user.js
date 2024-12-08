@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Question = require('../models/question');
 const Post = require('../models/Post');
 const Course = require('../models/course');
+const Comment = require('../models/comment');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Trang cá nhân',
@@ -76,7 +77,11 @@ module.exports.viewUserQuestions = async (req, res) => {
     // Get the total count of questions for pagination
     const totalQuestion = await Question.countDocuments();
     const totalPages = Math.ceil(totalQuestion / questionsPerPage);
-
+    // Fetch and add totalComments for each question
+    for (const question of questions) {
+        const totalComments = await Comment.countDocuments({ commentedOnQuestion: question._id });
+        question.totalComments = totalComments;  // Adding totalComments field
+    }
     // Render the page with the necessary data
     res.render('users/questionUserShow', {
         topic,
@@ -107,7 +112,7 @@ module.exports.viewUserPosts = async (req,res) => {
     }
 
     // Fetch post with the selected sort order
-    const post = await Post.find({author: req.params.id}).populate({
+    const posts = await Post.find({author: req.params.id}).populate({
         path: 'author',
         select: 'name _id'
     })
@@ -118,11 +123,17 @@ module.exports.viewUserPosts = async (req,res) => {
     // Get the total count of posts for pagination
     const totalPosts = await Post.countDocuments();
     const totalPages = Math.ceil(totalPosts / postsPerPage);
+    // Fetch and add totalComments for each question
+    for (const post of posts) {
+        const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
+        post.totalComments = totalComments;  // Adding totalComments field
+        console.log(post);
+    }
 
     // Render the page with the necessary data
     res.render('users/postUserShow', {
         topic,
-        post,
+        posts,
         currentPage: page,
         totalPages,
         sort  // Pass the current sort option to the template
