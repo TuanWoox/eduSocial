@@ -45,7 +45,7 @@ module.exports.index = async (req, res) => {
     
 
     //fetch the tag
-    const response = await fetch('/tags/popularTags');
+    const response = await fetch('http://edusocial.onrender.com/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
  
 

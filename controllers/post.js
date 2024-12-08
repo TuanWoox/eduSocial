@@ -51,7 +51,7 @@ module.exports.viewPost = async (req, res) => {
     const totalPages = Math.ceil(totalPosts / postsPerPage);
 
     //fetch the tag
-    const response = await fetch('/tags/popularTags');
+    const response = await fetch('http://edusocial.onrender.com/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
 
     // Fetch and add totalComments for each question
