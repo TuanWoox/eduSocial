@@ -124,3 +124,12 @@ module.exports.isAuthorOfRating = async (req,res,next) => {
     }
     next();
 }
+module.exports.isYou = async (req,res,next) => {
+    const isYou = req.user.equals(req.params.id);
+    if(!isYou)
+    {
+        req.flash('error', 'Bạn không có quyền làm như thế');
+        return res.redirect(`/users/${req.params.id}`);
+    }
+    next();
+}

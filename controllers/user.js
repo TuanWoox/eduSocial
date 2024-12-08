@@ -215,5 +215,12 @@ module.exports.viewUserCourses = async (req, res) => {
         totalPages: Math.ceil(count / perPage),
     });
 };
-
+module.exports.coursesParticipated = async (req,res) => {
+    const user = await User.findById(req.params.id)
+    .populate('coursesProgress.courseId')
+    res.render('users/courseParticipated', {
+        topic,
+        user
+    })
+}
 

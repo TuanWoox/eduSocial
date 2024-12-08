@@ -20,8 +20,13 @@ router.route('/:id/questions')
 router.route('/:id/posts')
 .get(CatchAsync(userControl.viewUserPosts))
 
+router.route('/:id/coursesParticipated')
+.get(isYou,CatchAsync(userControl.coursesParticipated));
+
 router.route('/:id/courses')
 .get(CatchAsync(userControl.viewUserCourses))
+
+
 
 router.route('/:id')
 .get(CatchAsync(userControl.viewAUserInfo));

@@ -81,9 +81,12 @@
     </div>
    
   </div>
-  <% if(currentUser) { %>
+  <% if(currentUser && user.equals(currentUser._id)) { %>
   <a href="/users/<%= user._id  %>/edit" class="btn btn-outline-info">Cập nhật thông tin</a>
-  <a href="/chats/<%= user._id  %>" class="btn btn-outline-info">Nhắn tin cho người này</a>
+ 
+  <% } %>
+  <% if(currentUser && !user.equals(currentUser._id)) { %>
+    <a href="/chats/<%= user._id  %>" class="btn btn-outline-info">Nhắn tin cho người này</a> 
   <% } %>
 
 </div>
