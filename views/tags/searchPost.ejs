@@ -140,7 +140,7 @@
                     <% popularTags.forEach(tag => { %>
                         <div class="tag-item d-flex justify-content-between align-items-center mb-3">
                             <p class="mb-0" style="color: red;"><%= tag.name %></p>
-                            <p class="mb-0"><a href="/tags/questionsTagged/<%= tag._id %>" style="text-decoration: none;">x<%= tag.numberOfQuestions %></a></p>
+                            <p class="mb-0"><a href="/tags/postsTagged/<%= tag._id %>" style="text-decoration: none;">x<%= tag.numberOfPosts %></a></p>
                         </div>
                     <% }) %>
                 </div>

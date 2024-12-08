@@ -274,7 +274,7 @@ module.exports.findPopularTags = async (req, res) => {
             { $limit: 10 }
         ]);
 
-       
+        console.log(tags);
         // Send the tags as a JSON response
         res.status(200).json(tags);
 
