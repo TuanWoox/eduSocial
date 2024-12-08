@@ -279,7 +279,8 @@ module.exports.editQuestion = async (req, res) => {
 };
 
 module.exports.deleteQuestion = async (req,res) => {
-    await Question.findByIdAndDelete(req.params.id)
+    const question = await Question.findByIdAndDelete(req.params.id)
+    const deletedNotification = await Notification.deleteMany({question: question._id});
     req.flash('success', 'Xóa câu hỏi thành công!!!');
     res.redirect('/questions');
 }

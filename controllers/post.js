@@ -314,6 +314,7 @@ module.exports.deletePost = async (req,res) =>{
         { postsTagged: post._id },  // Find tags that have the post._id in their postsTagged array
         { $pull: { postsTagged: post._id } }  // Pull (remove) post._id from the postsTagged array
     );
+    const deletedNotification = await Notification.deleteMany({post: post._id});
     req.flash('success', 'Đã xóa bài của bạn thành công!!!');
     res.redirect('/posts');
 }

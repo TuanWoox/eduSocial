@@ -23,7 +23,7 @@ const passportGoogle = require('./passportAuth/passportGoogle');
 const passportGithub = require('./passportAuth/passportGithub');
 const ExpressError = require('./utils/ExpressError');
 const dotenv = require('dotenv');
-const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/eduSocial';
+const dbUrl = process.env.MONGO_URI || 'mongodb://localhost:27017/eduSocial';
 
 const User = require('./models/User');
 
@@ -36,7 +36,7 @@ const PORT = process.env.PORT || 5000;
 
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(dbUrl)
 .then(() => console.log('MongoDB connected'))
 .catch((err) => console.error('Error connecting to MongoDB:', err));
 
