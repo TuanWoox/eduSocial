@@ -214,7 +214,7 @@ module.exports.viewAPost = async (req, res) => {
     let isLikedByUser = false;
     if(req.user)
     {
-        const isLikedByUser = post.isLiked.includes(req.user._id);
+        isLikedByUser = post.isLiked.includes(req.user._id);
     }
     res.render('posts/show', {
         topic,
