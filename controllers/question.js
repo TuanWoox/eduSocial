@@ -45,7 +45,7 @@ module.exports.index = async (req, res) => {
     
 
     //fetch the tag
-    const response = await fetch('http://localhost:5000/tags/popularTags');
+    const response = await fetch('/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
  
 
