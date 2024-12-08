@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Tag = require('../models/tag');
 const { json } = require('express');
 const question = require('../models/question');
+const Notification = require('../models/notification');
 const topic = {
     title: 'Hỏi đáp',
     description: 'Chia sẻ kiến thức, cùng nhau phát triển',
@@ -278,12 +279,35 @@ module.exports.deleteQuestion = async (req,res) => {
     req.flash('success', 'Xóa câu hỏi thành công!!!');
     res.redirect('/questions');
 }
-module.exports.likeQuestion = async (req,res) => {
-    const question = await Question.findById(req.params.id);
-    question.isLiked.push(req.user._id);
-    await question.save();
-    res.status(200).json({ status: "ok" });
-}
+module.exports.likeQuestion = async (req, res) => {
+    try {
+        const id = req.params.id; // Lấy id từ URL params
+        const question = await Question.findById(id);
+        if (!question) {
+            return res.status(404).json({ message: 'Câu hỏi không tồn tại.' });
+        }
+        
+        question.isLiked.push(req.user._id);
+        await question.save();
+        res.status(200).json({ status: "ok" });
+
+        const questions = await Question.findById(id).populate('author'); // Sửa id thành req.params.id
+        if (questions && questions.author && questions.author._id.toString() !== req.user._id.toString()) {
+            const notification = new Notification({
+                recipient: questions.author._id,
+                sender: req.user._id,
+                question: questions._id, // Sử dụng questions._id chứ không phải id
+                message: `${req.user.name} đã thích CÂU HỎI của bạn.`,
+                isRead: false
+            });
+            await notification.save();
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi thích câu hỏi.' });
+    }
+};
+
 module.exports.unLikeQuestion = async (req,res) => {
     const question = await Question.findById(req.params.id);
     question.isLiked.pull(req.user._id);

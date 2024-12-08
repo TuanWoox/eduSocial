@@ -1,6 +1,7 @@
 const Post = require('../models/Post'); 
 const Comment = require('../models/comment');
 const Tag = require('../models/tag');
+const Notification = require('../models/notification');
 const { cloudinary } = require('../cloudinary/postCloud');
 const topic = {
     title: 'Bài viết',
@@ -32,7 +33,7 @@ module.exports.viewPost = async (req, res) => {
     }
 
     // Fetch post with the selected sort order
-    const post = await Post.find()
+    const posts = await Post.find()
     .populate({
         path: 'author',
         select: 'name _id profilePic'
@@ -53,10 +54,17 @@ module.exports.viewPost = async (req, res) => {
     const response = await fetch('http://localhost:5000/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
 
+    // Fetch and add totalComments for each question
+    for (const post of posts) {
+        const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
+        post.totalComments = totalComments;  // Adding totalComments field
+        console.log(post);
+    }
+
     // Render the page with the necessary data
     res.render('posts/index', {
         topic,
-        post,
+        posts,
         currentPage: page,
         totalPages,
         popularTags,
@@ -95,7 +103,12 @@ module.exports.Search = async (req, res) => {
 
         const count = await Post.countDocuments({ title: { $regex: searchQuery, $options: 'i' } });
         const totalPages = Math.ceil(count / postsPerPage);
-
+        // Fetch and add totalComments for each question
+        for (const post of posts) {
+            const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
+            post.totalComments = totalComments;  // Adding totalComments field
+            console.log(post);
+        }
         res.render('posts/search', {
             topic,
             posts,  // Đổi thành posts để phù hợp với template
@@ -314,12 +327,35 @@ module.exports.deleteTinyMCE = async (req,res) => {
     const filename = decodeURIComponent(req.params.filename)
     await cloudinary.uploader.destroy(filename);
 }
-module.exports.likePost = async (req,res) => {
-    const post = await Post.findById(req.params.id);
-    post.isLiked.push(req.user._id);
-    await post.save();
-    res.status(200).json({ status: "ok" });
-}
+module.exports.likePost = async (req, res) => {
+    try {
+        const id = req.params.id; // Lấy id từ URL params
+        const post = await Post.findById(id);
+        if (!post) {
+            return res.status(404).json({ message: 'Câu hỏi không tồn tại.' });
+        }
+        
+        post.isLiked.push(req.user._id);
+        await post.save();
+        res.status(200).json({ status: "ok" });
+
+        const posts = await Post.findById(id).populate('author'); // Sửa id thành req.params.id
+        if (posts && posts.author && posts.author._id.toString() !== req.user._id.toString()) {
+            const notification = new Notification({
+                recipient: posts.author._id,
+                sender: req.user._id,
+                post: posts._id, // Sử dụng questions._id chứ không phải id
+                message: `${req.user.name} đã thích BÀI VIẾT của bạn.`,
+                isRead: false
+            });
+            await notification.save();
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi thích bài viết.' });
+    }
+};
+
 module.exports.unlikePost = async (req,res) => {
     const post = await Post.findById(req.params.id);
     post.isLiked.pull(req.user._id);

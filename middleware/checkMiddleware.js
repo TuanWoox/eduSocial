@@ -5,6 +5,7 @@ const Comment = require('../models/comment');
 const User = require('../models/User');
 const Rating = require('../models/rating');
 const Notification = require('../models/notification');
+const mongoose = require('mongoose');
 module.exports.isLoggedIn = (req,res,next) => {
     //isAuthenticated() is used to check if the cookie for the session is still valid!
     if(!req.isAuthenticated())
@@ -78,8 +79,9 @@ module.exports.isYou = async (req,res,next) => {
 }
 module.exports.isYourNotification = async (req,res,next) => {
     const notification = await Notification.findById(req.params.id)
-    if(!notification.equals(req.user_id))
+    if(!notification.recipient.equals(req.user._id))
     {
+        console.log('hehehe')
         req.flash('error', 'Bạn không có quyền để làm như thế!!!');
         return res.redirect(`/users/${req.user_id}`);
     }

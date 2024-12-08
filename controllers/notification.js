@@ -23,7 +23,6 @@ module.exports.getUserNotifications = async (req, res) => {
         const totalNotifications = await Notification.countDocuments({
             recipient: req.user._id
         });
-
         res.render('notifications/index', {
             topic,
             notifications,
@@ -37,7 +36,7 @@ module.exports.getUserNotifications = async (req, res) => {
 };
 //đánh dấu đã đọc
 module.exports.markAsRead = async (req, res) => {
-    try {
+    try {   
         const { id } = req.params;
         console.log(id);
         const notification = await Notification.findById(id);

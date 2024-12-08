@@ -25,7 +25,7 @@ const notificationSchema = new Schema(
         comment: {
             type: Schema.Types.ObjectId,
             ref: 'Comment',
-            required: true
+            required: false
         },
         message: {
             type: String,
