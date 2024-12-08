@@ -45,7 +45,7 @@ module.exports.index = async (req, res) => {
     
 
     //fetch the tag
-    const response = await fetch('/tags/popularTags');
+    const response = await fetch('http://localhost:5000/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
  
 
@@ -216,7 +216,7 @@ module.exports.viewQuestion = async (req, res) => {
     let isLikedByUser = false;
     if(req.user)
     {
-        const isLikedByUser = question.isLiked.includes(req.user._id);
+        isLikedByUser = question.isLiked.includes(req.user._id);
     }
     res.render('questions/show', {
         topic,

@@ -13,7 +13,10 @@ const storage = new CloudinaryStorage({
     cloudinary,
     params: {
         folder: 'EduSocial',
-        allowedFormats: ['jpeg', 'png', 'jpg']
+        allowedFormats: ['jpeg', 'png', 'jpg'],
+        transformation: [
+            { width: 820, height: 460, crop: 'limit' }, // Resize while maintaining aspect ratio
+        ],
     }
 });
 

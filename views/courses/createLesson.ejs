@@ -32,8 +32,7 @@
         selector: 'textarea#tinymce-content',
         plugins: 'image link code table lists preview wordcount fullscreen emoticons',
         toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
-                 'bullist numlist outdent indent | link image | code preview fullscreen | emoticons',
-
+                'bullist numlist outdent indent | link image | code preview fullscreen | emoticons',
         images_upload_handler: async function (blobInfo, progress) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();

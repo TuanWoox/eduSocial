@@ -51,7 +51,7 @@ module.exports.viewPost = async (req, res) => {
     const totalPages = Math.ceil(totalPosts / postsPerPage);
 
     //fetch the tag
-    const response = await fetch('/tags/popularTags');
+    const response = await fetch('http://localhost:5000/tags/popularTags');
     const popularTags = await response.json();  // Corrected the method to .json()
 
     // Fetch and add totalComments for each question
@@ -214,7 +214,7 @@ module.exports.viewAPost = async (req, res) => {
     let isLikedByUser = false;
     if(req.user)
     {
-        const isLikedByUser = post.isLiked.includes(req.user._id);
+        isLikedByUser = post.isLiked.includes(req.user._id);
     }
     res.render('posts/show', {
         topic,
