@@ -7,7 +7,7 @@ const notificationSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
-            index: true // Thêm chỉ mục
+            index: true // Add index for optimized queries
         },
         sender: {
             type: Schema.Types.ObjectId,
@@ -22,10 +22,18 @@ const notificationSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Question'
         },
+        course: { // Fix typo here
+            type: Schema.Types.ObjectId,
+            ref: 'Course'
+        },
         comment: {
             type: Schema.Types.ObjectId,
             ref: 'Comment',
             required: false
+        },
+        rating: {
+            type: Schema.Types.ObjectId,
+            ref: 'Rating'
         },
         message: {
             type: String,
@@ -39,7 +47,7 @@ const notificationSchema = new Schema(
     { timestamps: true }
 );
 
-// Tạo chỉ mục tổng hợp
+// Create a compound index for recipient and createdAt
 notificationSchema.index({ recipient: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

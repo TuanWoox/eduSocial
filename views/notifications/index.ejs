@@ -13,6 +13,8 @@
                         <a href="/posts/<%= notification.post._id %>" class="btn btn-link">Xem bài viết</a>
                     <% } else if (notification.question) { %>
                         <a href="/questions/<%= notification.question._id %>" class="btn btn-link">Xem câu hỏi</a>
+                    <% } else {%>
+                        <a href="/courses/<%= notification.course %>" class="btn btn-link">Xem khóa học</a>
                     <% } %>
                     <small class="text-muted d-block"><%= new Date(notification.createdAt).toLocaleString() %></small>
                     <% if (!notification.isRead) { %>
