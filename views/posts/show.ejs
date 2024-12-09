@@ -90,7 +90,7 @@
                         
                         <!-- Left Side: Author Image -->
                         <div class="me-3 text-center">
-                            <img src="<%= post.author.profilePic.url || '/pictures/user.png' %>" alt="Author" class="rounded-circle" width="80" height="80">
+                            <img src="<%= comment.author.profilePic.url || '/pictures/user.png' %>" alt="Author" class="rounded-circle" width="80" height="80">
                             <small class="d-block mt-1">
                                 <a href="/users/<%= comment.author ? comment.author._id : '#' %>" style="color: black; text-decoration: none;">
                                     <strong><%= comment.author ? comment.author.name : 'Unknown' %></strong>

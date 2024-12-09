@@ -10,36 +10,59 @@ const topic = {
 module.exports.sendAnswer = async (req, res) => {
     const id = req.params.id;
     const { body, replyTo } = req.body.answer;
-    //Tạo bình luận mới
+
+    // Tạo bình luận mới
     const newPostCommentData = {
         commentedOnPost: id,
         author: req.user._id,
-        body
+        body,
     };
+
+    let mentionedUser = null;
+
     if (replyTo && replyTo !== '') {
-        newPostCommentData.replyTo = replyTo; 
+        const replyToComment = await Comment.findById(replyTo).populate('author');
+        newPostCommentData.replyTo = replyTo;
+        mentionedUser = replyToComment.author; // Lấy người được mention
     }
+
     const newPostComment = new Comment(newPostCommentData);
     await newPostComment.save();
 
-    // 2. Tìm chủ sở hữu bài viết
+    // Tìm chủ sở hữu bài viết
     const post = await Post.findById(id).populate('author'); // Giả định Post có field `author` là ObjectId của User
-    if (post && post.author && post.author._id.toString() !== req.user._id.toString()) {
-        // 3. Tạo thông báo
-        const notification = new Notification({
-            recipient: post.author._id,
+    if(!mentionedUser || post && post.author._id.toString() !== mentionedUser._id.toString())
+    {
+        if (post && post.author && post.author._id.toString() !== req.user._id.toString()) {
+            // Tạo thông báo cho chủ sở hữu bài viết
+            const postNotification = new Notification({
+                recipient: post.author._id,
+                sender: req.user._id,
+                post: id,
+                comment: newPostComment._id,
+                message: `${req.user.name} đã bình luận BÀI VIẾT của bạn.`,
+                isRead: false,
+            });
+            await postNotification.save();
+        }
+    }
+    // Nếu có người được mention
+    if (mentionedUser && mentionedUser._id.toString() !== req.user._id.toString()) {
+        const mentionNotification = new Notification({
+            recipient: mentionedUser._id,
             sender: req.user._id,
             post: id,
             comment: newPostComment._id,
-            message: `${req.user.name} đã bình luận BÀI VIẾT của bạn.`,
-            isRead: false
+            message: `${req.user.name} đã trả lời BÌNH LUẬN của bạn`,
+            isRead: false,
         });
-        await notification.save();
+        await mentionNotification.save();
     }
 
     req.flash('success', 'Bình luận thành công');
     res.redirect(`/posts/${id}`);
 };
+
 module.exports.formEditAnswer = async (req,res) => {
     const postID = req.params.id;
     const commentID = req.params.commentID;

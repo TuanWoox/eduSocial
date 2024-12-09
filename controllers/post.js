@@ -58,7 +58,6 @@ module.exports.viewPost = async (req, res) => {
     for (const post of posts) {
         const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
         post.totalComments = totalComments;  // Adding totalComments field
-        console.log(post);
     }
 
     // Render the page with the necessary data
@@ -107,7 +106,6 @@ module.exports.Search = async (req, res) => {
         for (const post of posts) {
             const totalComments = await Comment.countDocuments({ commentedOnPost: post._id });
             post.totalComments = totalComments;  // Adding totalComments field
-            console.log(post);
         }
         res.render('posts/search', {
             topic,
@@ -181,7 +179,7 @@ module.exports.viewAPost = async (req, res) => {
     const post = await Post.findById(req.params.id)
     .populate({
         path: 'author',
-        select: 'name _id',
+        select: 'name _id profilePic',
     })
     .populate({
         path: 'tags', // Populate the 'tags' field
@@ -205,7 +203,7 @@ module.exports.viewAPost = async (req, res) => {
         },
         select: '_id body',
     });
-
+    console.log(comments);
     const totalComments = await Comment.countDocuments(query);
     const totalPages = Math.ceil(totalComments/commentsPerPage);
 

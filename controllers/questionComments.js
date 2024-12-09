@@ -15,14 +15,22 @@ module.exports.sendAnswer = async (req, res) => {
         author: req.user._id,
         body, 
     };
+    let mentionedUser = null;
+
     if (replyTo && replyTo !== '') {
+        const replyToComment = await Comment.findById(replyTo).populate('author');
         newQuestionCommentData.replyTo = replyTo;
+        mentionedUser = replyToComment.author; // Lấy người được mention
+        console.log(mentionedUser)
     }
+
     const newQuestionComment = new Comment(newQuestionCommentData)
     await newQuestionComment.save();
 
     // 2. Tìm chủ sở hữu bài viết
     const question = await Question.findById(id).populate('author'); // Giả định Post có field `author` là ObjectId của User
+    if(!mentionedUser || question && question.author._id.toString() !== mentionedUser._id.toString() )
+    {
     if (question && question.author && question.author._id.toString() !== req.user._id.toString()) {
         // 3. Tạo thông báo
         const notification = new Notification({
@@ -34,6 +42,19 @@ module.exports.sendAnswer = async (req, res) => {
             isRead: false
         });
         await notification.save();
+    }
+    }
+    // Nếu có người được mention
+    if (mentionedUser && mentionedUser._id.toString() !== req.user._id.toString()) {
+        const mentionNotification = new Notification({
+            recipient: mentionedUser._id,
+            sender: req.user._id,
+            question: id,
+            comment: newQuestionComment._id,
+            message: `${req.user.name} đã trả lời BÌNH LUẬN của bạn`,
+            isRead: false,
+        });
+        await mentionNotification.save();
     }
 
     res.redirect(`/questions/${id}`);
